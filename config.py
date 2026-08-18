@@ -12,31 +12,35 @@
 
 import os
 import random
-from os import environ,getenv
+from os import environ, getenv
 import logging
 from logging.handlers import RotatingFileHandler
+from dotenv import load_dotenv
 
-#AniZoneFlix on Tg
-TG_BOT_TOKEN = os.environ.get("TG_BOT_TOKEN", "8912467729:AAGy41fRctTZbRID_u1W5aaNPUBom8Da_pI")
-APP_ID = int(os.environ.get("APP_ID", "22266643"))
-API_HASH = os.environ.get("API_HASH", "7d0b85b4146034511b8776ed7ff99de4")
+# Load environment variables
+load_dotenv()
+
+# AniZoneFlix on Tg
+TG_BOT_TOKEN = getenv("TG_BOT_TOKEN")
+APP_ID = int(getenv("APP_ID", 0))
+API_HASH = getenv("API_HASH")
 #--------------------------------------------
 
-CHANNEL_ID = int(os.environ.get("CHANNEL_ID", "-1003748914288"))
-OWNER = os.environ.get("OWNER", "Alonekingstarback")
-OWNER_ID = int(os.environ.get("OWNER_ID", "8646416973"))
+CHANNEL_ID = int(getenv("CHANNEL_ID", 0))
+OWNER = getenv("OWNER", "Alonekingstarback")
+OWNER_ID = int(getenv("OWNER_ID", 0))
 #--------------------------------------------
-PORT = int(os.environ.get("PORT", "8080"))
+PORT = int(getenv("PORT", "8080"))
 #--------------------------------------------
-BOT_NAME = os.environ.get("BOT_NAME", "AniZoneFlix_bot")
-BOT_USERNAME = os.environ.get("BOT_USERNAME", "AniZoneFlix_Bot")
+BOT_NAME = getenv("BOT_NAME", "AniZoneFlix_bot")
+BOT_USERNAME = getenv("BOT_USERNAME", "AniZoneFlix_Bot")
 
-DB_URI = os.environ.get("DATABASE_URL", "mongodb+srv://hemanthbreaker2027:9550399779htr@cluster0.haybbxg.mongodb.net/?appName=Cluster0")
-DB_NAME = os.environ.get("DATABASE_NAME", BOT_USERNAME)
+DB_URI = getenv("DATABASE_URL")
+DB_NAME = getenv("DATABASE_NAME", BOT_USERNAME)
 #--------------------------------------------
-FSUB_LINK_EXPIRY = int(os.getenv("FSUB_LINK_EXPIRY", "10"))  # 0 means no expiry
-BAN_SUPPORT = os.environ.get("BAN_SUPPORT", "https://t.me/AniZoneFlix")
-TG_BOT_WORKERS = int(os.environ.get("TG_BOT_WORKERS", "200"))
+FSUB_LINK_EXPIRY = int(getenv("FSUB_LINK_EXPIRY", "10"))  # 0 means no expiry
+BAN_SUPPORT = getenv("BAN_SUPPORT", "https://t.me/AniZoneFlix")
+TG_BOT_WORKERS = int(getenv("TG_BOT_WORKERS", "200"))
 #--------------------------------------------
 # Random Anime Banners (Neon / Dark Theme)
 ANIME_BANNERS = [
@@ -53,17 +57,17 @@ PICS = ANIME_BANNERS
 
 #--------------------------------------------
 # URL SHORTENER AUTHENTICATION GATE CONFIG
-SHORTENER_URL = os.environ.get("SHORTENER_URL", "arolinks.com")
-SHORTENER_API_KEY = os.environ.get("SHORTENER_API_KEY", "e49643875c2fa34dd6087254e58283d65ffc7748")
-WEBSITE_URL = os.environ.get("WEBSITE_URL", "https://filestore-1-6jyo.onrender.com")
-CDN_URL = os.environ.get("CDN_URL", WEBSITE_URL)
+SHORTENER_URL = getenv("SHORTENER_URL", "arolinks.com")
+SHORTENER_API_KEY = getenv("SHORTENER_API_KEY")
+WEBSITE_URL = getenv("WEBSITE_URL", "https://filestore-1-6jyo.onrender.com")
+CDN_URL = getenv("CDN_URL", WEBSITE_URL)
 
-TUT_VID = os.environ.get("TUT_VID","https://t.me/anizoneflix")
+TUT_VID = getenv("TUT_VID", "https://t.me/anizoneflix")
 
-RECAPTCHA_SITE_KEY = os.environ.get("RECAPTCHA_SITE_KEY", "6LdOLfwsAAAAANkiGTcrwoB7IHC9u6XLJpovE1tW")
-RECAPTCHA_SECRET_KEY = os.environ.get("RECAPTCHA_SECRET_KEY", "6LdOLfwsAAAAABFUieiXiCN0KqFGrb-kFHsqxv9X")
-TURNSTILE_SITE_KEY = os.environ.get("TURNSTILE_SITE_KEY", "0x4AAAAAADWJAgikExadhPkL")
-TURNSTILE_SECRET_KEY = os.environ.get("TURNSTILE_SECRET_KEY", "0x4AAAAAADWJAkGd5SOPe028oM1Lk_I_mgc")
+RECAPTCHA_SITE_KEY = getenv("RECAPTCHA_SITE_KEY")
+RECAPTCHA_SECRET_KEY = getenv("RECAPTCHA_SECRET_KEY")
+TURNSTILE_SITE_KEY = getenv("TURNSTILE_SITE_KEY")
+TURNSTILE_SECRET_KEY = getenv("TURNSTILE_SECRET_KEY")
 #--------------------------------------------
 SHORT_MSG = (
     "━━━━━━━━━━━━━━━━━━━\n"
@@ -104,14 +108,14 @@ ABOUT_TXT = (
     "━━━━━━━━━━━━━━━━━━━"
 )
 #--------------------------------------------
-START_MSG = os.environ.get("START_MESSAGE", (
+START_MSG = getenv("START_MESSAGE", (
     "━━━━━━━━━━━━━━━━━━━\n"
     "⚡ <b>Welcome, {mention}!</b>\n\n"
     "<blockquote>💎 I am a powerful secure file storage bot.\n"
     "I can save and deliver your files securely with lightning-fast speeds! 🚀</blockquote>\n"
     "━━━━━━━━━━━━━━━━━━━"
 ))
-FORCE_MSG = os.environ.get("FORCE_SUB_MESSAGE", (
+FORCE_MSG = getenv("FORCE_SUB_MESSAGE", (
     "━━━━━━━━━━━━━━━━━━━\n"
     "🚫 <b>Access Denied</b>\n\n"
     "<blockquote>Hey {mention}, please join our official channels\n"
@@ -142,42 +146,42 @@ CMD_TXT = """━━━━━━━━━━━━━━━━━━━
 💎 <b>Powered by <code>https://t.me/AniZoneFlix</code></b>
 ━━━━━━━━━━━━━━━━━━━"""
 #--------------------------------------------
-CUSTOM_CAPTION = os.environ.get("CUSTOM_CAPTION", "<b>• By <code>https://t.me/AniZoneFlix</code></b>") #set your Custom Caption here, Keep None for Disable Custom Caption
-PROTECT_CONTENT = True if os.environ.get('PROTECT_CONTENT', "False") == "True" else False #set True if you want to prevent users from forwarding files from bot
+CUSTOM_CAPTION = getenv("CUSTOM_CAPTION", "<b>• By <code>https://t.me/AniZoneFlix</code></b>")  # set your Custom Caption here, Keep None for Disable Custom Caption
+PROTECT_CONTENT = getenv('PROTECT_CONTENT', "False") == "True"  # set True if you want to prevent users from forwarding files from bot
 #--------------------------------------------
-#Set true if you want Disable your Channel Posts Share button
-DISABLE_CHANNEL_BUTTON = os.environ.get("DISABLE_CHANNEL_BUTTON", None) == 'True'
+# Set true if you want Disable your Channel Posts Share button
+DISABLE_CHANNEL_BUTTON = getenv("DISABLE_CHANNEL_BUTTON", "False") == 'True'
 #--------------------------------------------
 BOT_STATS_TEXT = "📊 <b>System Uptime</b>\n\n<code>{uptime}</code>"
 USER_REPLY_TEXT = "❌ <b>Access Denied</b>\n\nYou do not have permission to use this command. 🛡️"
 
 #==========================(BUY PREMIUM)====================#
 
-OWNER_TAG = os.environ.get("OWNER_TAG", "ᴀɴɪᴢᴏɴᴇꜰʟɪx")
-UPI_ID = os.environ.get("UPI_ID", "AniZoneFlix@AniZoneFlix")
+OWNER_TAG = getenv("OWNER_TAG", "ᴀɴɪᴢᴏɴᴇꜰʟɪx")
+UPI_ID = getenv("UPI_ID", "AniZoneFlix@AniZoneFlix")
 QR_PIC = random.choice(ANIME_BANNERS)
-SCREENSHOT_URL = os.environ.get("SCREENSHOT_URL", f"t.me/AniZoneFlix")
+SCREENSHOT_URL = getenv("SCREENSHOT_URL", "t.me/AniZoneFlix")
 #--------------------------------------------
-#Time and its price
+# Time and its price
 # 7 Days
-PRICE1 = os.environ.get("PRICE1", "29 rs")
+PRICE1 = getenv("PRICE1", "29 rs")
 
 # 1 Month
-PRICE2 = os.environ.get("PRICE2", "99 rs")
+PRICE2 = getenv("PRICE2", "99 rs")
 
 # 3 Months
-PRICE3 = os.environ.get("PRICE3", "249 rs")
+PRICE3 = getenv("PRICE3", "249 rs")
 
 # 6 Months
-PRICE4 = os.environ.get("PRICE4", "449 rs")
+PRICE4 = getenv("PRICE4", "449 rs")
 
 # 1 Year
-PRICE5 = os.environ.get("PRICE5", "799 rs")
+PRICE5 = getenv("PRICE5", "799 rs")
 
 #===================(END)========================#
 
 # Default Proxies Config (Supports http://username:password@ip:port format)
-PROXIES = []
+PROXIES = getenv("PROXIES", "").split(",") if getenv("PROXIES") else []
 
 LOG_FILE_NAME = "filesharingbot.txt"
 
