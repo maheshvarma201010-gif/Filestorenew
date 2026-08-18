@@ -1,0 +1,26 @@
+#https://github.com/rjriajul/wzgram
+wzgram>=3.0.20
+#pyrogram
+#pyrofork
+TgCrypto
+pyromod==1.5
+schedule
+APscheduler
+# --- For-Database ------------ #
+pymongo
+motor
+dnspython
+# --- For-Web-Response ------- #
+aiohttp
+python-dotenv
+# --- For-Web-Response ------- #
+pytz
+requests
+bs4
+aiofiles
+asyncio
+cryptography
+fastapi
+uvicorn
+itsdangerous
+python-multipart

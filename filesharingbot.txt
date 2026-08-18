@@ -1,0 +1,56 @@
+[11-Jul-26 11:22:15 - INFO] - ProxyManager - Loaded 0 proxies from database/config.
+[11-Jul-26 11:22:36 - INFO] - ProxyManager - Loaded 0 proxies from database/config.
+[11-Jul-26 11:22:36 - INFO] - ProxyManager - Loaded 1 proxies from database/config.
+[11-Jul-26 11:22:36 - INFO] - ProxyManager - Selected proxy (Random): http://dummy_user:******@127.0.0.1:8080
+[11-Jul-26 11:22:36 - INFO] - ProxyManager - [PROXY] Attempting GET https://ipv4.webshare.io/ with proxy: http://dummy_user:******@127.0.0.1:8080
+[11-Jul-26 11:22:36 - WARNING] - ProxyManager - [PROXY] Request failed with proxy http://dummy_user:******@127.0.0.1:8080: ClientProxyConnectionError (Cannot connect to host 127.0.0.1:8080 ssl:default [Connect call failed ('127.0.0.1', 8080)]). Marking proxy as failed.
+[11-Jul-26 11:22:36 - INFO] - ProxyManager - [PROXY] All proxies failed. Falling back to direct connection for GET https://ipv4.webshare.io/
+[11-Jul-26 11:22:36 - INFO] - ProxyManager - Loaded 0 proxies from database/config.
+[11-Jul-26 11:25:08 - INFO] - ProxyManager - Loaded 0 proxies from database/config.
+[11-Jul-26 12:06:51 - INFO] - ProxyManager - Loaded 0 proxies from database/config.
+[11-Jul-26 12:06:55 - INFO] - ProxyManager - Loaded 1 proxies from database/config.
+[11-Jul-26 12:06:55 - INFO] - web_server - Tracing shortlink: https://arolinks.com/qfmj
+[11-Jul-26 12:06:55 - INFO] - ProxyManager - Selected proxy (Random): http://lviklvys:******@31.59.20.176:6754
+[11-Jul-26 12:06:56 - INFO] - web_server - Found window.location redirect: https://jobskiki.in/studyuniversitiess/?studyedu=qfmj&uiso=31
+[11-Jul-26 12:06:56 - INFO] - web_server - Method 2 (HTML parsing) traced last URL: https://jobskiki.in/studyuniversitiess/?studyedu=qfmj&uiso=31
+[11-Jul-26 12:22:36 - INFO] - ProxyManager - Loaded 0 proxies from database/config.
+[11-Jul-26 12:22:39 - INFO] - ProxyManager - Loaded 1 proxies from database/config.
+[11-Jul-26 12:22:39 - INFO] - web_server - Tracing shortlink: https://arolinks.com/qfmj
+[11-Jul-26 12:22:39 - INFO] - ProxyManager - Selected proxy (Random): http://lviklvys:******@31.59.20.176:6754
+[11-Jul-26 12:22:41 - INFO] - web_server - Found window.location redirect: https://jobskiki.in/studyuniversitiess/?studyedu=qfmj&uiso=31
+[11-Jul-26 12:22:41 - INFO] - web_server - Method 2 (HTML parsing) traced last URL: https://jobskiki.in/studyuniversitiess/?studyedu=qfmj&uiso=31
+[11-Jul-26 12:34:48 - INFO] - ProxyManager - Loaded 0 proxies from database/config.
+[11-Jul-26 12:34:52 - INFO] - ProxyManager - Loaded 1 proxies from database/config.
+[11-Jul-26 12:34:52 - INFO] - ProxyManager - Selected proxy (Random): http://lviklvys:******@31.59.20.176:6754
+[11-Jul-26 12:34:52 - INFO] - ProxyManager - [PROXY] Attempting GET https://arolinks.com/api?api=e49643875c2fa34dd6087254e58283d65ffc7748&url=https%3A//filestore-1-6jyo.onrender.com/track/7cbb28bd_0df7_47fe_93a3_e1143f552d9e with proxy: http://lviklvys:******@31.59.20.176:6754
+[11-Jul-26 12:34:53 - INFO] - web_server - Tracing shortlink: https://arolinks.com/Vdlq
+[11-Jul-26 12:34:53 - INFO] - ProxyManager - Selected proxy (Random): http://lviklvys:******@31.59.20.176:6754
+[11-Jul-26 12:34:55 - INFO] - web_server - Found window.location redirect: https://jobskiki.in/studyuniversitiess/?studyedu=Vdlq&uiso=9367
+[11-Jul-26 12:34:55 - INFO] - web_server - Method 2 (HTML parsing) traced last URL: https://jobskiki.in/studyuniversitiess/?studyedu=Vdlq&uiso=9367
+[11-Jul-26 12:34:55 - INFO] - web_server - Tracing shortlink: https://arolinks.com/st?api=e49643875c2fa34dd6087254e58283d65ffc7748&url=https://filestore-1-6jyo.onrender.com/track/7cbb28bd_0df7_47fe_93a3_e1143f552d9e
+[11-Jul-26 12:34:55 - INFO] - ProxyManager - Selected proxy (Random): http://lviklvys:******@31.59.20.176:6754
+[11-Jul-26 12:34:56 - INFO] - web_server - Method 2 (HTML parsing) traced last URL: https://filestore-1-6jyo.onrender.com/track/7cbb28bd_0df7_47fe_93a3_e1143f552d9e
+[12-Jul-26 12:52:45 - INFO] - ProxyManager - Loaded 0 proxies from database/config.
+[14-Jul-26 11:26:42 - INFO] - ProxyManager - Loaded 0 proxies from database/config.
+[14-Jul-26 11:26:42 - INFO] - web_server - Tracing shortlink: https://shortener.com/st?api=mock_api&url=http%3A//localhost%3A8080/track/test_token_trace
+[14-Jul-26 11:27:35 - INFO] - ProxyManager - Loaded 0 proxies from database/config.
+[14-Jul-26 11:27:35 - INFO] - web_server - Tracing shortlink: https://shortener.com/st?api=mock_api&url=http%3A//localhost%3A8080/track/test_token_chrome_restore
+[17-Jul-26 09:04:55 - INFO] - ProxyManager - Loaded 0 proxies from database/config.
+[17-Jul-26 09:05:05 - INFO] - bot - Bot @anizoneflix_bot is initializing background tasks...
+[17-Jul-26 09:05:10 - INFO] - root - Database indexes created successfully.
+[17-Jul-26 09:05:23 - INFO] - bot - Bot @anizoneflixs_bot is initializing background tasks...
+[17-Jul-26 09:05:26 - INFO] - root - Database indexes created successfully.
+[17-Jul-26 09:05:31 - INFO] - bot - Bot @movieszoneflix_bot is initializing background tasks...
+[17-Jul-26 09:05:33 - INFO] - root - Database indexes created successfully.
+[17-Jul-26 09:05:38 - INFO] - bot - Bot @ani_teluguflix_bot is initializing background tasks...
+[17-Jul-26 09:05:41 - INFO] - root - Database indexes created successfully.
+[17-Jul-26 09:05:46 - INFO] - bot - Bot @ani_hindiflix_bot is initializing background tasks...
+[17-Jul-26 09:05:48 - INFO] - root - Database indexes created successfully.
+[17-Jul-26 09:05:54 - INFO] - bot - Bot @ani_tamilflix_bot is initializing background tasks...
+[17-Jul-26 09:05:56 - INFO] - root - Database indexes created successfully.
+[17-Jul-26 09:06:01 - INFO] - bot - Bot @anizoneflix_ongoing_bot is initializing background tasks...
+[17-Jul-26 09:06:03 - INFO] - root - Database indexes created successfully.
+[17-Jul-26 09:06:09 - INFO] - bot - Bot @anizoneflix_singlefilesinsu_bot is initializing background tasks...
+[17-Jul-26 09:06:11 - INFO] - root - Database indexes created successfully.
+[17-Jul-26 09:07:22 - WARNING] - pyrogram.session.session - [Bot] Waiting for 2 seconds before continuing (required by "messages.ForwardMessages")
+[17-Jul-26 09:08:54 - WARNING] - pyrogram.session.session - [Bot] Waiting for 2 seconds before continuing (required by "messages.ForwardMessages")
