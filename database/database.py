@@ -106,7 +106,8 @@ class AniZoneFlix:
             'website_url', 'api_url', 'base_url', 'cdn_url', 'owner_tag', 'upi_id',
             'anime_banners', 'video_banners', 'app_id', 'api_hash', 'owner_id',
             'use_recaptcha', 'recaptcha_site_key', 'recaptcha_secret_key',
-            'use_turnstile', 'turnstile_site_key', 'turnstile_secret_key'
+            'use_turnstile', 'turnstile_site_key', 'turnstile_secret_key',
+            'verify_bot_active', 'verify_api_url', 'verify_api_secret', 'verify_bot_username'
         ]
 
         default_settings = {
@@ -160,7 +161,11 @@ class AniZoneFlix:
             'api_hash': config.API_HASH,
             'owner_id': config.OWNER_ID,
             'custom_caption_active': True,
-            'custom_caption_text': "<b>• By `https://t.me/AniZoneFlix`</b>"
+            'custom_caption_text': "<b>• By `https://t.me/AniZoneFlix`</b>",
+            'verify_bot_active': False,
+            'verify_api_url': getattr(config, 'VERIFY_API_URL', 'https://your-verify-api.example.com'),
+            'verify_api_secret': getattr(config, 'VERIFY_API_SECRET', 'your_random_api_secret'),
+            'verify_bot_username': getattr(config, 'VERIFY_BOT_USERNAME', 'YourVerifyBot')
         }
 
         if not settings:
@@ -204,7 +209,8 @@ class AniZoneFlix:
             'website_url', 'api_url', 'base_url', 'cdn_url', 'owner_tag', 'upi_id',
             'anime_banners', 'video_banners', 'app_id', 'api_hash', 'owner_id',
             'use_recaptcha', 'recaptcha_site_key', 'recaptcha_secret_key',
-            'use_turnstile', 'turnstile_secret_key', 'verify_log_destinations'
+            'use_turnstile', 'turnstile_secret_key', 'verify_log_destinations',
+            'verify_bot_active', 'verify_api_url', 'verify_api_secret', 'verify_bot_username'
         ]
 
         doc_id = 'bot_settings'
@@ -298,7 +304,8 @@ class AniZoneFlix:
             'website_url', 'api_url', 'base_url', 'cdn_url', 'owner_tag', 'upi_id',
             'anime_banners', 'video_banners', 'app_id', 'api_hash', 'owner_id',
             'use_recaptcha', 'recaptcha_site_key', 'recaptcha_secret_key',
-            'use_turnstile', 'turnstile_secret_key', 'verify_log_destinations'
+            'use_turnstile', 'turnstile_secret_key', 'verify_log_destinations',
+            'verify_bot_active', 'verify_api_url', 'verify_api_secret', 'verify_bot_username'
         ]
 
         global_data = {}

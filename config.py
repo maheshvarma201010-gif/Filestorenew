@@ -68,6 +68,11 @@ RECAPTCHA_SITE_KEY = getenv("RECAPTCHA_SITE_KEY")
 RECAPTCHA_SECRET_KEY = getenv("RECAPTCHA_SECRET_KEY")
 TURNSTILE_SITE_KEY = getenv("TURNSTILE_SITE_KEY")
 TURNSTILE_SECRET_KEY = getenv("TURNSTILE_SECRET_KEY")
+
+# Central Verify Bot Credentials
+VERIFY_API_URL = getenv("VERIFY_API_URL", "https://your-verify-api.example.com")
+VERIFY_API_SECRET = getenv("VERIFY_API_SECRET", "your_random_api_secret")
+VERIFY_BOT_USERNAME = getenv("VERIFY_BOT_USERNAME", "YourVerifyBot")
 #--------------------------------------------
 SHORT_MSG = (
     "━━━━━━━━━━━━━━━━━━━\n"

@@ -17,6 +17,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse, StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
+import config
 from config import (
     SHORTENER_URL, SHORTENER_API_KEY, WEBSITE_URL, PICS, 
     BOT_NAME, BOT_USERNAME, TURNSTILE_SITE_KEY, TURNSTILE_SECRET_KEY, 
@@ -457,9 +458,89 @@ async def process_direct_verification_redirect(request: Request, token: str, tok
     redirect_token = await db.create_local_redirect(target_verification_url, expire=600)
     return RedirectResponse(url=f"{web_url}/redirect?token={redirect_token}")
 
+async def verify_user_remote_api(api_url: str, api_secret: str, user_id: int, originating_bot: str, session_id: str):
+    """Sends verification callback to remote VERIFY_API_URL upon completion."""
+    if not api_url or not api_url.startswith("http"):
+        return False
+    try:
+        headers = {
+            "Authorization": f"Bearer {api_secret}",
+            "Content-Type": "application/json"
+        }
+        payload = {
+            "user_id": user_id,
+            "originating_bot": originating_bot,
+            "session_id": session_id,
+            "status": "verified",
+            "verified_at": time.time()
+        }
+        async with aiohttp.ClientSession() as session:
+            async with session.post(f"{api_url.rstrip('/')}/api/verifybot/verify", json=payload, headers=headers, timeout=10) as resp:
+                return resp.status == 200
+    except Exception as e:
+        logger.error(f"Error in verify_user_remote_api: {e}")
+        return False
+
 @app.get("/health")
 async def health_handler():
     return {"status": "✅ Anizoneflix Secure Active"}
+
+@app.post("/api/verifybot/verify")
+async def verifybot_api_verify(request: Request):
+    """API endpoint for Central Verify Bot to notify originating bot of successful user verification."""
+    try:
+        auth_header = request.headers.get("Authorization", "")
+        token = auth_header.replace("Bearer ", "").strip() if auth_header.startswith("Bearer ") else ""
+
+        settings = await db.get_settings()
+        expected_secret = settings.get('verify_api_secret', getattr(config, 'VERIFY_API_SECRET', 'your_random_api_secret'))
+
+        if token != expected_secret:
+            raise HTTPException(status_code=401, detail="Unauthorized: Invalid API Secret")
+
+        data = await request.json()
+        user_id = data.get("user_id")
+        originating_bot = data.get("originating_bot")
+        session_id = data.get("session_id", "central_verify")
+
+        if not user_id or not originating_bot:
+            raise HTTPException(status_code=400, detail="Missing required fields: user_id and originating_bot")
+
+        user_id = int(user_id)
+        originating_bot = str(originating_bot).lower().replace("@", "")
+
+        # Set user as verified for originating bot
+        await db.set_user_verified(user_id, bot_username=originating_bot, token=session_id)
+        await db.set_verified_worker(originating_bot, user_id)
+
+        logger.info(f"[VERIFYBOT API] User {user_id} verified successfully for bot @{originating_bot}")
+        return {"success": True, "message": f"User {user_id} verified for bot @{originating_bot}"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"[VERIFYBOT API ERROR] {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/verifybot/status")
+async def verifybot_api_status(request: Request, user_id: int, bot_username: str):
+    """API endpoint to check if a user is currently verified for a bot."""
+    try:
+        auth_header = request.headers.get("Authorization", "")
+        token = auth_header.replace("Bearer ", "").strip() if auth_header.startswith("Bearer ") else ""
+
+        settings = await db.get_settings()
+        expected_secret = settings.get('verify_api_secret', getattr(config, 'VERIFY_API_SECRET', 'your_random_api_secret'))
+
+        if token != expected_secret:
+            raise HTTPException(status_code=401, detail="Unauthorized: Invalid API Secret")
+
+        is_verified = await db.is_user_verified(user_id, bot_username=bot_username)
+        return {"user_id": user_id, "bot_username": bot_username, "is_verified": is_verified}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"[VERIFYBOT API STATUS ERROR] {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/", response_class=HTMLResponse)
 async def root_handler(request: Request):
@@ -875,11 +956,19 @@ async def track_handler(request: Request, token: str):
         if referral_id and settings.get('referral_active'):
             await db.update_referral_status(token_data['user_id'], "completed", verified=True, content_accessed=True)
 
+        user_id = int(token_data['user_id'])
+        originating_bot = bot_uname or BOT_USERNAME
+
+        # If Central Verify Bot mode is active or this is a central verify session, notify remote API / originating bot
+        verify_api_url = settings.get('verify_api_url', getattr(config, 'VERIFY_API_URL', 'https://your-verify-api.example.com'))
+        verify_api_secret = settings.get('verify_api_secret', getattr(config, 'VERIFY_API_SECRET', 'your_random_api_secret'))
+        if settings.get('verify_bot_active', False) and verify_api_url:
+            asyncio.create_task(verify_user_remote_api(verify_api_url, verify_api_secret, user_id, originating_bot, session_id))
+
         # Instantly deliver the files in the background to automatically continue the user's request
         try:
             bot = getattr(request.app.state, 'bot', None)
             if bot:
-                user_id = int(token_data['user_id'])
                 content_id = token_data['content_id']
 
                 await db.set_user_verified(user_id, bot_username=bot_uname, token=session_id)
@@ -893,7 +982,6 @@ async def track_handler(request: Request, token: str):
 
                 # Send verification completed log to all configured destinations using main bot
                 try:
-                    user_id = int(token_data['user_id'])
                     user_obj = await bot.get_users(user_id) if bot else None
                     traced_link = token_data.get('original_shortlink') or token_data.get('traced_url') or f"Session: {session_id}"
                     from plugins.start import send_verify_log

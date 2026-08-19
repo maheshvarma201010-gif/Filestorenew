@@ -853,3 +853,75 @@ async def set_web_url_command(client: Client, message: Message):
     await db.update_setting('website_url', val, bot_username=client.username)
     await message.reply_text(f"✅ <b>ᴡᴇʙsɪᴛᴇ ᴜʀʟ sᴜᴄᴄᴇssꜰᴜʟʟʏ ᴜᴘᴅᴀᴛᴇᴅ ᴛᴏ:</b> <code>{val}</code> 💎")
     await db.log_event(message.from_user.id, "WEBSITE_URL_UPDATED", f"Set Website URL to {val}")
+
+@Client.on_message(filters.command(['verifybot', 'VERIFYBOT']) & filters.private & admin)
+async def verify_bot_command(client: Client, message: Message):
+    settings = await db.get_settings()
+    v_active = settings.get('verify_bot_active', False)
+    v_url = settings.get('verify_api_url', getattr(config, 'VERIFY_API_URL', 'https://your-verify-api.example.com'))
+    v_secret = settings.get('verify_api_secret', getattr(config, 'VERIFY_API_SECRET', 'your_random_api_secret'))
+    v_bot = settings.get('verify_bot_username', getattr(config, 'VERIFY_BOT_USERNAME', 'YourVerifyBot'))
+
+    if len(message.command) < 2:
+        status_str = "ENABLED ✅" if v_active else "DISABLED ❌"
+        return await message.reply_text(
+            f"🤖 <b>˹ Central Verify Bot Manager ˼</b>\n\n"
+            f"◈ <b>Status:</b> <code>{status_str}</code>\n"
+            f"◈ <b>Verify Bot Username:</b> <code>@{v_bot.replace('@', '')}</code>\n"
+            f"◈ <b>API URL:</b> <code>{v_url}</code>\n"
+            f"◈ <b>API Secret:</b> <code>{v_secret}</code>\n\n"
+            "📜 <b>Usage:</b>\n"
+            "• <code>/VERIFYBOT on</code> — Enable Central Verify Bot & redirect all users to Verify Bot\n"
+            "• <code>/VERIFYBOT off</code> — Disable Central Verify Bot & restore independent verification\n"
+            "• <code>/VERIFYBOT config [username] [api_url] [api_secret]</code> — Update Verify Bot settings"
+        )
+
+    arg = message.command[1].lower()
+
+    if arg == "on":
+        await db.update_setting('verify_bot_active', True)
+        await db.log_event(message.from_user.id, "VERIFY_BOT_TOGGLED", "Enabled Central Verify Bot")
+        return await message.reply_text(
+            "✅ <b>Central Verify Bot System ENABLED!</b>\n\n"
+            "All existing independent verification on the main bot and clone bots has been disabled.\n"
+            f"Every main and clone bot will now direct users to <code>@{v_bot.replace('@', '')}</code>.\n\n"
+            "🔑 <b>Verify Bot API Access Details:</b>\n"
+            f"• <b>Verify Bot Username:</b> <code>@{v_bot.replace('@', '')}</code>\n"
+            f"• <b>API Verification Endpoint:</b> <code>{v_url}/api/verifybot/verify</code>\n"
+            f"• <b>API Status Endpoint:</b> <code>{v_url}/api/verifybot/status</code>\n"
+            f"• <b>API Secret Key:</b> <code>{v_secret}</code>\n"
+            f"• <b>Auth Header:</b> <code>Authorization: Bearer {v_secret}</code>\n\n"
+            "<i>Provide these API credentials to your Central Verify Bot so it can verify users on main and clone bots upon completion.</i>"
+        )
+    elif arg == "off":
+        await db.update_setting('verify_bot_active', False)
+        await db.log_event(message.from_user.id, "VERIFY_BOT_TOGGLED", "Disabled Central Verify Bot")
+        return await message.reply_text(
+            "✅ <b>Central Verify Bot System DISABLED!</b>\n\n"
+            "Existing independent verification system has been restored for main bot and all clone bots."
+        )
+    elif arg == "config":
+        if len(message.command) < 5:
+            return await message.reply_text(
+                "⚠️ <b>Usage:</b>\n"
+                "<code>/VERIFYBOT config [verify_bot_username] [api_url] [api_secret]</code>\n\n"
+                "Example:\n"
+                "<code>/VERIFYBOT config CentralVerifyBot https://api.verify.com secret123</code>"
+            )
+        new_bot = message.command[2].strip().replace("@", "")
+        new_url = message.command[3].strip()
+        new_secret = message.command[4].strip()
+
+        await db.update_setting('verify_bot_username', new_bot)
+        await db.update_setting('verify_api_url', new_url)
+        await db.update_setting('verify_api_secret', new_secret)
+        await db.log_event(message.from_user.id, "VERIFY_BOT_CONFIGURED", f"Updated Verify Bot to @{new_bot}")
+
+        return await message.reply_text(
+            f"✅ <b>Central Verify Bot configuration updated!</b>\n\n"
+            f"◈ <b>Username:</b> <code>@{new_bot}</code>\n"
+            f"◈ <b>API URL:</b> <code>{new_url}</code>\n"
+            f"◈ <b>API Secret:</b> <code>{new_secret}</code>"
+        )
+    else:
+        return await message.reply_text("❌ <b>Invalid action! Use <code>on</code>, <code>off</code>, or <code>config</code>.</b>")

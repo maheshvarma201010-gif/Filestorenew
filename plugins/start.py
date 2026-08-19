@@ -496,8 +496,37 @@ async def send_files(client: Client, user_id: int, base64_string, messages=None,
 async def short_url(client: Client, message: Message, base64_string, anim_msg=None):
     user_id = message.from_user.id
 
+    # Check if user is already verified
+    is_verified = await db.is_user_verified(user_id, bot_username=client.username)
+    if is_verified:
+        await db.decrement_user_credits(user_id, bot_username=client.username)
+        return await send_files(client, user_id, base64_string)
+
     # Credentials and status from merged settings
     settings = await db.get_settings(bot_username=client.username)
+
+    # Check Central Verify Bot Mode
+    verify_bot_active = settings.get('verify_bot_active', False)
+    verify_bot_username = settings.get('verify_bot_username', getattr(config, 'VERIFY_BOT_USERNAME', 'YourVerifyBot')).strip().replace('@', '')
+
+    if verify_bot_active and verify_bot_username:
+        # Central Verify Bot is enabled: Generate deep link to Central Verify Bot
+        originating_bot = client.username.lower() if client.username else BOT_USERNAME.lower()
+        deeplink_url = f"https://t.me/{verify_bot_username}?start=vb_{originating_bot}_{base64_string}"
+
+        buttons = [
+            [InlineKeyboardButton("✅ Verify via Central Verify Bot", url=deeplink_url, style=ButtonStyle.PRIMARY)],
+            [InlineKeyboardButton("✅ I Have Verified", url=f"https://t.me/{client.username}?start={base64_string}", style=ButtonStyle.SUCCESS)]
+        ]
+
+        heading = RichText.format_heading("Verification Required", level=1)
+        body = f"🛡️ <b>Centralized Security Verification Active</b>\n\nTo access your requested file, please complete verification using our central <b>@{verify_bot_username}</b>."
+        caption = f"{heading}\n\n{body}"
+
+        if anim_msg:
+            return await anim_msg.edit(text=caption, reply_markup=InlineKeyboardMarkup(buttons))
+        else:
+            return await message.reply(text=caption, reply_markup=InlineKeyboardMarkup(buttons))
 
     # 0. Check Shortener Status
     shortener_cfg = settings.get('shortener', {})
@@ -933,6 +962,36 @@ async def verify_command(client: Client, message: Message):
     user_id = message.from_user.id
     settings = await db.get_settings(bot_username=client.username)
 
+    verify_bot_active = settings.get('verify_bot_active', False)
+    verify_bot_username = settings.get('verify_bot_username', getattr(config, 'VERIFY_BOT_USERNAME', 'YourVerifyBot')).strip().replace('@', '')
+
+    if verify_bot_active and verify_bot_username:
+        originating_bot = client.username.lower() if client.username else BOT_USERNAME.lower()
+        deeplink_url = f"https://t.me/{verify_bot_username}?start=vb_{originating_bot}_verify_general"
+
+        buttons = [
+            [InlineKeyboardButton("✅ Verify via Central Verify Bot", url=deeplink_url, style=ButtonStyle.PRIMARY)]
+        ]
+
+        caption = (
+            "<b>━━━━━━━━━━━━━━━━━━━━━━━━\n"
+            "🔑 ˹ Central Verify Bot ˼\n"
+            "━━━━━━━━━━━━━━━━━━━━━━━━</b>\n\n"
+            f"<blockquote>Hey {message.from_user.mention},\n\n"
+            f"Verification is managed centrally by <b>@{verify_bot_username}</b>.\n"
+            "Tap below to complete verification and unlock access for this bot.</blockquote>"
+        )
+
+        banners = await get_banners(client)
+        photo = random.choice(banners) if banners else None
+        return await send_media(
+            client=client,
+            chat_id=message.chat.id,
+            photo=photo,
+            caption=caption,
+            reply_markup=InlineKeyboardMarkup(buttons),
+        )
+
     # Check if already verified
     user = await db.user_data.find_one({'_id': user_id})
     is_verified = await db.is_user_verified(user_id, bot_username=client.username)
@@ -1217,6 +1276,35 @@ async def start_command(client: Client, message: Message):
     # Handle deep link payload
     text = message.text
     if len(text) > 7:
+        # Check Central Verify Bot Deep Link Session Payload
+        try:
+            basic_payload = text.split(" ", 1)[1].strip()
+        except IndexError:
+            basic_payload = ""
+
+        # Handle Central Verify Bot Deep Link Incoming Flow
+        if basic_payload.startswith("vb_"):
+            # Format: vb_{originating_bot}_{payload}
+            parts = basic_payload.split("_", 2)
+            if len(parts) == 3:
+                originating_bot = parts[1]
+                content_payload = parts[2]
+                session_id, wrapped_token = await db.create_verification_session(
+                    user_id, content_payload, bot_username=originating_bot
+                )
+                web_url = settings.get('website_url', WEBSITE_URL).rstrip('/')
+                verify_url = f"{web_url}/verify/{session_id}"
+                buttons = [
+                    [InlineKeyboardButton("✅ Start Verification", url=verify_url, style=ButtonStyle.PRIMARY)]
+                ]
+                return await message.reply_text(
+                    f"🛡️ <b>Central Verification Link Created</b>\n\n"
+                    f"Originating Bot: <b>@{originating_bot}</b>\n"
+                    f"Session ID: <code>{session_id}</code>\n\n"
+                    f"Click below to complete verification.",
+                    reply_markup=InlineKeyboardMarkup(buttons)
+                )
+
         # Check Shortener Status (SYSTEM button)
         settings = await db.get_settings(bot_username=client.username)
         shortener_active = settings.get('shortener_active', True)
