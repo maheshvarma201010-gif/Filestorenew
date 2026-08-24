@@ -427,6 +427,11 @@ async def send_files(client: Client, user_id: int, base64_string, messages=None,
             # User preference: "Custom caption allow to modify"
             original_caption = msg.caption.html if (msg.caption and hasattr(msg.caption, "html")) else (msg.caption or "")
             caption = f"{original_caption}\n\n{custom_caption}" if (original_caption and custom_caption) else (original_caption or custom_caption)
+
+            # Truncate caption for media to prevent MEDIA_CAPTION_TOO_LONG errors
+            if caption and len(caption) > 1024:
+                caption = caption[:1020] + "..."
+
             reply_markup = None
 
             # Round-robin selection of helper bot based on index to distribute workload
@@ -440,12 +445,14 @@ async def send_files(client: Client, user_id: int, base64_string, messages=None,
                 clients_to_try = [Bot.helper_clients[t] for t in ordered_tokens] + [client]
 
             sent_msg = None
+            from_chat_id = msg.chat.id if (msg and hasattr(msg, 'chat') and msg.chat and getattr(msg.chat, 'id', None)) else cid
+
             for current_client in clients_to_try:
                 try:
                     protect_val = await get_protect_content_for_user(user_id, client.username)
                     sent_msg = await current_client.copy_message(
                         chat_id=user_id,
-                        from_chat_id=msg.chat.id,
+                        from_chat_id=from_chat_id,
                         message_id=msg.id,
                         caption=caption,
                         parse_mode=ParseMode.HTML,
@@ -476,33 +483,39 @@ async def send_files(client: Client, user_id: int, base64_string, messages=None,
             except: pass
             return
 
-        if FILE_AUTO_DELETE > 0:
-            notification_msg = await client.send_message(
-                chat_id=user_id,
-                text=f"<b>⚡️ <blockquote>˹ ᴀᴜᴛᴏ ᴅᴇʟᴇᴛᴇ ᴀʟᴇʀᴛ ˼\n\n🛡 ᴛʜɪs ꜰɪʟᴇ ᴡɪʟʟ ʙᴇ ᴛᴇʀᴍɪɴᴀᴛᴇᴅ ɪɴ {get_exp_time(FILE_AUTO_DELETE)}.\n\n💎 ᴘʟᴇᴀsᴇ sᴀᴠᴇ ᴏʀ ꜰᴏʀᴡᴀʀᴅ ɪᴛ ᴛᴏ ʏᴏᴜʀ sᴀᴠᴇᴅ ᴍᴇssᴀɢᴇs ʙᴇꜰᴏʀᴇ ɪᴛ ɪs ɢᴏɴᴇ! 💫</blockquote></b>"
-            )
+        if FILE_AUTO_DELETE > 0 and AniZoneFlix_msgs:
+            async def auto_delete_task(cli, uid, msgs, delay, reload_payload):
+                try:
+                    notification_msg = await cli.send_message(
+                        chat_id=uid,
+                        text=f"<b>⚡️ <blockquote>˹ ᴀᴜᴛᴏ ᴅᴇʟᴇᴛᴇ ᴀʟᴇʀᴛ ˼\n\n🛡 ᴛʜɪs ꜰɪʟᴇ ᴡɪʟʟ ʙᴇ ᴛᴇʀᴍɪɴᴀᴛᴇᴅ ɪɴ {get_exp_time(delay)}.\n\n💎 ᴘʟᴇᴀsᴇ sᴀᴠᴇ ᴏʀ ꜰᴏʀᴡᴀʀᴅ ɪᴛ ᴛᴏ ʏᴏᴜʀ sᴀᴠᴇᴅ ᴍᴇssᴀɢᴇs ʙᴇꜰᴏʀᴇ ɪᴛ ɪs ɢᴏɴᴇ! 💫</blockquote></b>"
+                    )
 
-            await asyncio.sleep(FILE_AUTO_DELETE)
+                    await asyncio.sleep(delay)
 
-            for snt_msg in AniZoneFlix_msgs:
-                if snt_msg:
-                    try:    
-                        await snt_msg.delete()  
+                    for snt_msg in msgs:
+                        if snt_msg:
+                            try:
+                                await snt_msg.delete()
+                            except Exception as e:
+                                print(f"Error deleting message {getattr(snt_msg, 'id', '')}: {e}")
+
+                    try:
+                        reload_url = f"https://t.me/{cli.username}?start={reload_payload}"
+                        keyboard = InlineKeyboardMarkup(
+                            [[InlineKeyboardButton("⚡️ ˹ ʀᴇᴄᴏᴠᴇʀ ꜰɪʟᴇ ˼ ⚡️", url=reload_url, style=ButtonStyle.PRIMARY)]]
+                        )
+
+                        await notification_msg.edit(
+                            f"<b>🛡 <blockquote>˹ ꜰɪʟᴇ ᴛᴇʀᴍɪɴᴀᴛᴇᴅ ˼\n\n💎 ʏᴏᴜʀ ᴠɪᴅᴇᴏ / ꜰɪʟᴇ ɪs sᴜᴄᴄᴇssꜰᴜʟʟʏ ᴅᴇʟᴇᴛᴇᴅ !!\n\n🚀 ᴄʟɪᴄᴋ ʙᴇʟᴏᴡ ʙᴜᴛᴛᴏɴ ᴛᴏ ʀᴇᴄᴏᴠᴇʀ ʏᴏᴜʀ ᴅᴇʟᴇᴛᴇᴅ ᴀssᴇᴛ 👇\n\n<code>{reload_url}</code></blockquote></b>",
+                            reply_markup=keyboard
+                        )
                     except Exception as e:
-                        print(f"Error deleting message {snt_msg.id}: {e}")
+                        print(f"Error updating notification with 'Get File Again' button: {e}")
+                except Exception as ex:
+                    print(f"Error in background auto_delete_task: {ex}")
 
-            try:
-                reload_url = f"https://t.me/{client.username}?start={base64_string}"
-                keyboard = InlineKeyboardMarkup(
-                    [[InlineKeyboardButton("⚡️ ˹ ʀᴇᴄᴏᴠᴇʀ ꜰɪʟᴇ ˼ ⚡️", url=reload_url, style=ButtonStyle.PRIMARY)]]
-                )
-
-                await notification_msg.edit(
-                    f"<b>🛡 <blockquote>˹ ꜰɪʟᴇ ᴛᴇʀᴍɪɴᴀᴛᴇᴅ ˼\n\n💎 ʏᴏᴜʀ ᴠɪᴅᴇᴏ / ꜰɪʟᴇ ɪs sᴜᴄᴄᴇssꜰᴜʟʟʏ ᴅᴇʟᴇᴛᴇᴅ !!\n\n🚀 ᴄʟɪᴄᴋ ʙᴇʟᴏᴡ ʙᴜᴛᴛᴏɴ ᴛᴏ ʀᴇᴄᴏᴠᴇʀ ʏᴏᴜʀ ᴅᴇʟᴇᴛᴇᴅ ᴀssᴇᴛ 👇\n\n<code>{reload_url}</code></blockquote></b>",
-                    reply_markup=keyboard
-                )
-            except Exception as e:
-                print(f"Error updating notification with 'Get File Again' button: {e}")
+            asyncio.create_task(auto_delete_task(client, user_id, AniZoneFlix_msgs, FILE_AUTO_DELETE, base64_string))
 
     except Exception as e:
         print(f"Final Error in send_files: {e}")
