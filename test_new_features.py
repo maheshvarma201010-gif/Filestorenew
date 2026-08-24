@@ -258,5 +258,46 @@ class TestCarousel(unittest.TestCase):
         self.assertIsNotNone(media_video)
         self.assertEqual(media_video.media, "video_id")
 
+class TestIdDecoder(unittest.TestCase):
+    def test_get_real_id_multiplied_and_raw(self):
+        db_channels = [-1003748914288]
+        CHANNEL_ID = -1003748914288
+
+        def get_real_id(val):
+            if not val or val == 0:
+                return None, None
+            for cid in db_channels:
+                if cid and val % abs(cid) == 0:
+                    return val // abs(cid), cid
+
+            default_cid = None
+            if db_channels:
+                default_cid = db_channels[0]
+            elif CHANNEL_ID:
+                default_cid = CHANNEL_ID
+
+            if default_cid and val % abs(default_cid) == 0:
+                return val // abs(default_cid), default_cid
+
+            return val, default_cid
+
+        # Test 1: Multiplied ID
+        raw_msg_id = 37150
+        channel_id = -1003748914288
+        converted_val = raw_msg_id * abs(channel_id)
+        msg_id, cid = get_real_id(converted_val)
+        self.assertEqual(msg_id, 37150)
+        self.assertEqual(cid, -1003748914288)
+
+        # Test 2: Raw message ID (unmultiplied)
+        raw_val = 37150
+        msg_id2, cid2 = get_real_id(raw_val)
+        self.assertEqual(msg_id2, 37150)
+        self.assertEqual(cid2, -1003748914288)
+
+        # Test 3: None/Zero ID
+        self.assertEqual(get_real_id(0), (None, None))
+        self.assertEqual(get_real_id(None), (None, None))
+
 if __name__ == "__main__":
     unittest.main()

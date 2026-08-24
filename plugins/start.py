@@ -224,17 +224,31 @@ async def send_files(client: Client, user_id: int, base64_string, messages=None,
                 db_channels = [client.db_channel.id]
             elif hasattr(client, 'db_channel_id') and client.db_channel_id:
                 db_channels = [client.db_channel_id]
+            elif CHANNEL_ID:
+                db_channels = [CHANNEL_ID]
 
         def get_real_id(val):
+            if not val or val == 0:
+                return None, None
             for cid in db_channels:
-                if val % abs(cid) == 0:
+                if cid and val % abs(cid) == 0:
                     return val // abs(cid), cid
-            # Fallback to default if not found in list (standardize)
-            if hasattr(client, 'db_channel') and client.db_channel:
-                return val // abs(client.db_channel.id), client.db_channel.id
+
+            default_cid = None
+            if db_channels:
+                default_cid = db_channels[0]
+            elif hasattr(client, 'db_channel') and client.db_channel:
+                default_cid = client.db_channel.id
             elif hasattr(client, 'db_channel_id') and client.db_channel_id:
-                return val // abs(client.db_channel_id), client.db_channel_id
-            return None, None
+                default_cid = client.db_channel_id
+            elif CHANNEL_ID:
+                default_cid = CHANNEL_ID
+
+            if default_cid and val % abs(default_cid) == 0:
+                return val // abs(default_cid), default_cid
+
+            # If val is raw (unmultiplied message ID), val ITSELF is the real message ID!
+            return val, default_cid
 
         get_match = re.match(r"^get-(-?\d+)(?:-(-?\d+))?$", string)
         list_match = re.match(r"^list-(-?\d+)-(.+)$", string)
@@ -578,15 +592,31 @@ async def short_url(client: Client, message: Message, base64_string, anim_msg=No
             db_channels = [client.db_channel.id]
         elif hasattr(client, 'db_channel_id') and client.db_channel_id:
             db_channels = [client.db_channel_id]
+        elif CHANNEL_ID:
+            db_channels = [CHANNEL_ID]
 
     def get_real_id_simple(val):
+        if not val or val == 0:
+            return None, None
         for c in db_channels:
-            if val % abs(c) == 0: return val // abs(c), c
-        if hasattr(client, 'db_channel') and client.db_channel:
-            return val // abs(client.db_channel.id), client.db_channel.id
+            if c and val % abs(c) == 0:
+                return val // abs(c), c
+
+        default_cid = None
+        if db_channels:
+            default_cid = db_channels[0]
+        elif hasattr(client, 'db_channel') and client.db_channel:
+            default_cid = client.db_channel.id
         elif hasattr(client, 'db_channel_id') and client.db_channel_id:
-            return val // abs(client.db_channel_id), client.db_channel_id
-        return None, None
+            default_cid = client.db_channel_id
+        elif CHANNEL_ID:
+            default_cid = CHANNEL_ID
+
+        if default_cid and val % abs(default_cid) == 0:
+            return val // abs(default_cid), default_cid
+
+        # If val is raw (unmultiplied message ID), val ITSELF is the real message ID!
+        return val, default_cid
 
     get_match = re.match(r"^get-(-?\d+)(?:-(-?\d+))?$", string)
     list_match = re.match(r"^list-(-?\d+)-(.+)$", string)

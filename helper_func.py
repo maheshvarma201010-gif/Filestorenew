@@ -486,16 +486,23 @@ async def get_messages(client, message_ids, chat_id=None):
     messages = []
     total_messages = 0
 
-    # Get all DB channels for this specific bot if chat_id not provided
+    db_channels = []
     if chat_id:
-        db_channels = [chat_id]
-    else:
-        db_channels = await db.get_all_db_channels(client.username)
-        if not db_channels:
-            if hasattr(client, 'db_channel') and client.db_channel:
-                db_channels = [client.db_channel.id]
-            elif hasattr(client, 'db_channel_id') and client.db_channel_id:
-                db_channels = [client.db_channel_id]
+        db_channels.append(chat_id)
+
+    bot_uname = getattr(client, "username", None)
+    if bot_uname:
+        known_channels = await db.get_all_db_channels(bot_uname)
+        for c in known_channels:
+            if c and c not in db_channels:
+                db_channels.append(c)
+
+    if hasattr(client, 'db_channel') and client.db_channel and client.db_channel.id not in db_channels:
+        db_channels.append(client.db_channel.id)
+    if hasattr(client, 'db_channel_id') and client.db_channel_id and client.db_channel_id not in db_channels:
+        db_channels.append(client.db_channel_id)
+    if CHANNEL_ID and CHANNEL_ID not in db_channels:
+        db_channels.append(CHANNEL_ID)
 
     if not db_channels:
         return []
