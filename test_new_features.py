@@ -8,6 +8,10 @@ from bs4 import BeautifulSoup
 # Ensure current folder is in python path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
+import telebot
+from telebot.types import InlineKeyboardButton as TelebotInlineKeyboardButton, InlineKeyboardMarkup as TelebotInlineKeyboardMarkup
+from helper_func import ColorInlineKeyboardButton, InlineKeyboardButton, InlineKeyboardMarkup, ButtonStyle
+
 from utils.formatter import RichText, check_client_compatibility
 from utils.carousel import get_input_media
 from helper_func import FSUB_CACHE
@@ -257,6 +261,42 @@ class TestCarousel(unittest.TestCase):
         media_video = get_input_media(msg_video, "Video Caption")
         self.assertIsNotNone(media_video)
         self.assertEqual(media_video.media, "video_id")
+
+class TestTelebotColorInlineKeyboardButton(unittest.TestCase):
+    def test_inheritance(self):
+        btn = ColorInlineKeyboardButton("Download", callback_data="dl")
+        self.assertIsInstance(btn, TelebotInlineKeyboardButton)
+
+    def test_style_and_to_dict(self):
+        btn = ColorInlineKeyboardButton("Download File", callback_data="dl_1", style="success", icon_custom_emoji_id="99999")
+        self.assertEqual(btn.style, "success")
+        self.assertEqual(btn.icon_custom_emoji_id, "99999")
+
+        d = btn.to_dict()
+        self.assertEqual(d["text"], "Download File")
+        self.assertEqual(d["callback_data"], "dl_1")
+        self.assertEqual(d["style"], "success")
+        self.assertEqual(d["icon_custom_emoji_id"], "99999")
+
+    def test_automatic_style_assignment(self):
+        btn_success = InlineKeyboardButton("Download Now", callback_data="dl")
+        self.assertEqual(btn_success.style, ButtonStyle.SUCCESS)
+
+        btn_danger = InlineKeyboardButton("Delete File", callback_data="del")
+        self.assertEqual(btn_danger.style, ButtonStyle.DANGER)
+
+        btn_primary = InlineKeyboardButton("More Info", callback_data="info")
+        self.assertEqual(btn_primary.style, ButtonStyle.PRIMARY)
+
+    def test_inline_keyboard_markup_with_telebot(self):
+        btn1 = ColorInlineKeyboardButton("Btn 1", callback_data="b1", style="primary")
+        btn2 = ColorInlineKeyboardButton("Btn 2", callback_data="b2", style="danger")
+        markup = InlineKeyboardMarkup([[btn1, btn2]])
+        self.assertIsInstance(markup, TelebotInlineKeyboardMarkup)
+        d = markup.to_dict()
+        self.assertEqual(len(d["inline_keyboard"][0]), 2)
+        self.assertEqual(d["inline_keyboard"][0][0]["style"], "primary")
+        self.assertEqual(d["inline_keyboard"][0][1]["style"], "danger")
 
 if __name__ == "__main__":
     unittest.main()
