@@ -56,6 +56,7 @@ def random_button_style():
 class ColorInlineKeyboardButton(PyrogramInlineKeyboardButton):
     def __init__(self, text: str, *args, **kwargs):
         style = kwargs.pop("style", None)
+        icon_custom_emoji_id = kwargs.pop("icon_custom_emoji_id", None)
 
         # Map new style names if explicitly passed
         if style in ["bg_success", "bg_danger", "bg_primary"]:
@@ -86,15 +87,29 @@ class ColorInlineKeyboardButton(PyrogramInlineKeyboardButton):
                     style_enum = ButtonStyle.PRIMARY
 
         self.style = style_enum
+        if icon_custom_emoji_id is not None:
+            self.icon_custom_emoji_id = icon_custom_emoji_id
 
+        extra_kwargs = {}
         if style_enum is not None:
+            extra_kwargs["style"] = style_enum
+        if icon_custom_emoji_id is not None:
+            extra_kwargs["icon_custom_emoji_id"] = icon_custom_emoji_id
+
+        if extra_kwargs:
             try:
-                super().__init__(text, *args, style=style_enum, **kwargs)
+                super().__init__(text, *args, **extra_kwargs, **kwargs)
                 return
             except TypeError:
-                pass
-            except Exception:
-                pass
+                # Fallback if pyrogram/pyrofork version doesn't accept style/icon_custom_emoji_id in __init__
+                if "icon_custom_emoji_id" in extra_kwargs:
+                    extra_kwargs.pop("icon_custom_emoji_id")
+                if "style" in extra_kwargs:
+                    try:
+                        super().__init__(text, *args, style=extra_kwargs["style"], **kwargs)
+                        return
+                    except TypeError:
+                        pass
 
         super().__init__(text, *args, **kwargs)
 
