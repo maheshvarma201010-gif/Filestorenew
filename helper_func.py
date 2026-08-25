@@ -11,38 +11,25 @@ import urllib.parse
 import hashlib
 import random
 
+import telebot
+from telebot.types import InlineKeyboardMarkup as TelebotInlineKeyboardMarkup, InlineKeyboardButton as TelebotInlineKeyboardButton
+
 try:
     from pyrogram import filters
     from pyrogram.enums import ChatMemberStatus
-    from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton as PyrogramInlineKeyboardButton
+    from pyrogram.types import Message
 except ImportError:
     from pyrofork import filters
     from pyrofork.enums import ChatMemberStatus
-    from pyrofork.types import Message, InlineKeyboardMarkup, InlineKeyboardButton as PyrogramInlineKeyboardButton
-
-HAS_BUTTON_STYLE = False
-PyrogramButtonStyle = None
-
-try:
-    try:
-        from pyrogram.enums.button_style import ButtonStyle as PyrogramButtonStyle
-    except ImportError:
-        try:
-            from pyrogram.enums import ButtonStyle as PyrogramButtonStyle
-        except ImportError:
-            from pyrofork.enums import ButtonStyle as PyrogramButtonStyle
-    if PyrogramButtonStyle is not None:
-        HAS_BUTTON_STYLE = True
-except ImportError:
-    pass
+    from pyrofork.types import Message
 
 class ButtonStyle:
-    PRIMARY = getattr(PyrogramButtonStyle, "PRIMARY", "primary") if PyrogramButtonStyle else "primary"
-    SUCCESS = getattr(PyrogramButtonStyle, "SUCCESS", "success") if PyrogramButtonStyle else "success"
-    DANGER = getattr(PyrogramButtonStyle, "DANGER", "danger") if PyrogramButtonStyle else "danger"
-    DEFAULT = getattr(PyrogramButtonStyle, "DEFAULT", "default") if PyrogramButtonStyle else "default"
-    SECONDARY = PRIMARY
-    WARNING = SUCCESS
+    PRIMARY = "primary"
+    SUCCESS = "success"
+    DANGER = "danger"
+    DEFAULT = "default"
+    SECONDARY = "primary"
+    WARNING = "success"
 
 SUPPORTED_STYLES = [
     ButtonStyle.PRIMARY,
@@ -53,56 +40,120 @@ SUPPORTED_STYLES = [
 def random_button_style():
     return random.choice(SUPPORTED_STYLES)
 
-class ColorInlineKeyboardButton(PyrogramInlineKeyboardButton):
+_orig_telebot_to_dict = TelebotInlineKeyboardButton.to_dict
+
+def _patched_telebot_to_dict(self):
+    res = _orig_telebot_to_dict(self)
+    if hasattr(self, "style") and self.style is not None:
+        res["style"] = self.style
+    if hasattr(self, "icon_custom_emoji_id") and self.icon_custom_emoji_id is not None:
+        res["icon_custom_emoji_id"] = self.icon_custom_emoji_id
+    return res
+
+TelebotInlineKeyboardButton.to_dict = _patched_telebot_to_dict
+
+class ColorInlineKeyboardButton(TelebotInlineKeyboardButton):
     def __init__(self, text: str, *args, **kwargs):
         style = kwargs.pop("style", None)
+        icon_custom_emoji_id = kwargs.pop("icon_custom_emoji_id", None)
 
-        # Map new style names if explicitly passed
         if style in ["bg_success", "bg_danger", "bg_primary"]:
             if style == "bg_success":
-                style_enum = ButtonStyle.SUCCESS
+                style_val = ButtonStyle.SUCCESS
             elif style == "bg_danger":
-                style_enum = ButtonStyle.DANGER
+                style_val = ButtonStyle.DANGER
             else:
-                style_enum = ButtonStyle.PRIMARY
-        elif isinstance(style, ButtonStyle):
-            style_enum = style
+                style_val = ButtonStyle.PRIMARY
+        elif style in [ButtonStyle.PRIMARY, ButtonStyle.SUCCESS, ButtonStyle.DANGER, ButtonStyle.DEFAULT]:
+            style_val = style
+        elif style is not None:
+            style_str = str(style).lower()
+            if style_str in ["primary", "success", "danger", "default"]:
+                style_val = style_str
+            else:
+                style_val = ButtonStyle.PRIMARY
         else:
-            # Try to resolve other formats
-            style_str = str(style).upper() if style else ""
-            if hasattr(ButtonStyle, style_str):
-                style_enum = getattr(ButtonStyle, style_str)
+            text_lower = str(text).lower()
+            success_keywords = ["download", "get", "generate", "start", "continue", "confirm", "watch", "active", "verify", "yes"]
+            danger_keywords = ["delete", "remove", "cancel", "stop", "ban", "no", "close", "clear", "reset"]
+
+            if any(kw in text_lower for kw in success_keywords):
+                style_val = ButtonStyle.SUCCESS
+            elif any(kw in text_lower for kw in danger_keywords):
+                style_val = ButtonStyle.DANGER
             else:
-                # Automatic Color Assignment based on button text
-                text_lower = str(text).lower()
-                success_keywords = ["download", "get", "generate", "start", "continue", "confirm", "watch", "active", "verify", "yes"]
-                danger_keywords = ["delete", "remove", "cancel", "stop", "ban", "no", "close", "clear", "reset"]
-
-                if any(kw in text_lower for kw in success_keywords):
-                    style_enum = ButtonStyle.SUCCESS
-                elif any(kw in text_lower for kw in danger_keywords):
-                    style_enum = ButtonStyle.DANGER
-                else:
-                    style_enum = ButtonStyle.PRIMARY
-
-        self.style = style_enum
-
-        if style_enum is not None:
-            try:
-                super().__init__(text, *args, style=style_enum, **kwargs)
-                return
-            except TypeError:
-                pass
-            except Exception:
-                pass
+                style_val = ButtonStyle.PRIMARY
 
         super().__init__(text, *args, **kwargs)
+        self.style = style_val
+        self.icon_custom_emoji_id = icon_custom_emoji_id
 
 ColoredInlineKeyboardButton = ColorInlineKeyboardButton
 InlineKeyboardButton = ColorInlineKeyboardButton
 
+telebot.types.InlineKeyboardButton = ColorInlineKeyboardButton
+
+class InlineKeyboardMarkup(TelebotInlineKeyboardMarkup):
+    def __init__(self, keyboard=None, row_width=3):
+        super().__init__(row_width=row_width)
+        if keyboard:
+            for row in keyboard:
+                if isinstance(row, list):
+                    self.add(*row)
+                else:
+                    self.add(row)
+
+    @property
+    def inline_keyboard(self):
+        return self.keyboard
+
+    async def write(self, client):
+        import pyrogram.raw as raw
+        rows = []
+        for r in self.keyboard:
+            buttons = []
+            for b in r:
+                buttons.append(await b.write(client))
+            rows.append(raw.types.KeyboardButtonRow(buttons=buttons))
+        return raw.types.ReplyInlineMarkup(rows=rows)
+
+async def _btn_write(self, client):
+    import pyrogram.raw as raw
+    if getattr(self, "callback_data", None) is not None:
+        data = bytes(self.callback_data, "utf-8") if isinstance(self.callback_data, str) else self.callback_data
+        return raw.types.KeyboardButtonCallback(text=self.text, data=data)
+    if getattr(self, "url", None) is not None:
+        return raw.types.KeyboardButtonUrl(text=self.text, url=self.url)
+    if getattr(self, "login_url", None) is not None:
+        return self.login_url.write(text=self.text, bot=await client.resolve_peer(self.login_url.bot_username or "self"))
+    if getattr(self, "user_id", None) is not None:
+        return raw.types.InputKeyboardButtonUserProfile(text=self.text, user_id=await client.resolve_peer(self.user_id))
+    if getattr(self, "switch_inline_query", None) is not None:
+        return raw.types.KeyboardButtonSwitchInline(text=self.text, query=self.switch_inline_query)
+    if getattr(self, "switch_inline_query_current_chat", None) is not None:
+        return raw.types.KeyboardButtonSwitchInline(text=self.text, query=self.switch_inline_query_current_chat, same_peer=True)
+    if getattr(self, "callback_game", None) is not None:
+        return raw.types.KeyboardButtonGame(text=self.text)
+    if getattr(self, "web_app", None) is not None:
+        return raw.types.KeyboardButtonWebView(text=self.text, url=self.web_app.url)
+
+TelebotInlineKeyboardButton.write = _btn_write
+
 import pyrogram.types
 pyrogram.types.InlineKeyboardButton = ColorInlineKeyboardButton
+pyrogram.types.InlineKeyboardMarkup = InlineKeyboardMarkup
+try:
+    import pyrofork.types
+    pyrofork.types.InlineKeyboardButton = ColorInlineKeyboardButton
+    pyrofork.types.InlineKeyboardMarkup = InlineKeyboardMarkup
+except Exception:
+    pass
+try:
+    import wzgram.types
+    wzgram.types.InlineKeyboardButton = ColorInlineKeyboardButton
+    wzgram.types.InlineKeyboardMarkup = InlineKeyboardMarkup
+except Exception:
+    pass
 from config import *
 from pyrogram.errors.exceptions.bad_request_400 import UserNotParticipant
 from pyrogram.errors import FloodWait
@@ -141,8 +192,15 @@ async def get_banners(client=None):
 
 async def send_media(client, chat_id, photo, caption, reply_markup, message_effect_id=None):
     """Helper to send photo or video based on URL extension. Fallbacks to text if photo is empty."""
+    extra_kwargs = {}
+    if message_effect_id is not None:
+        extra_kwargs['message_effect_id'] = message_effect_id
+
     if not photo:
-        return await client.send_message(chat_id=chat_id, text=caption, reply_markup=reply_markup, message_effect_id=message_effect_id)
+        try:
+            return await client.send_message(chat_id=chat_id, text=caption, reply_markup=reply_markup, **extra_kwargs)
+        except TypeError:
+            return await client.send_message(chat_id=chat_id, text=caption, reply_markup=reply_markup)
 
     is_video = str(photo).lower().split('?')[0].endswith(('.mp4', '.mkv', '.webm'))
     try:
@@ -162,7 +220,10 @@ async def send_media(client, chat_id, photo, caption, reply_markup, message_effe
             )
     except Exception as e:
         print(f"Error in send_media: {e}")
-        return await client.send_message(chat_id=chat_id, text=caption, reply_markup=reply_markup, message_effect_id=message_effect_id)
+        try:
+            return await client.send_message(chat_id=chat_id, text=caption, reply_markup=reply_markup, **extra_kwargs)
+        except TypeError:
+            return await client.send_message(chat_id=chat_id, text=caption, reply_markup=reply_markup)
 
 #used for cheking if a user is admin ~Owner also treated as admin level
 async def check_admin(filter, client, update):
