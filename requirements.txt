@@ -1,5 +1,6 @@
 #https://github.com/rjriajul/wzgram
 wzgram>=3.0.20
+pyTelegramBotAPI==4.26.0
 #pyrogram
 #pyrofork
 TgCrypto
