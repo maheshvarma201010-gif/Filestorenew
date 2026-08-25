@@ -19,7 +19,7 @@ from datetime import datetime, timedelta
 from pyrogram import Client, filters, __version__
 from pyrogram.enums import ParseMode, ChatAction
 from pyrogram.types import Message, InlineKeyboardMarkup, CallbackQuery, ReplyKeyboardMarkup, ChatInviteLink, ChatPrivileges
-from helper_func import InlineKeyboardButton, random_button_style, ButtonStyle
+from helper_func import InlineKeyboardButton, random_button_style
 from pyrogram.errors.exceptions.bad_request_400 import UserNotParticipant
 from pyrogram.errors import FloodWait, UserIsBlocked, InputUserDeactivated, UserNotParticipant
 from config import *
@@ -43,7 +43,7 @@ async def ban_user_cmd(client: Client, message: Message):
             "📜 <b>ᴜsᴀɢᴇ:</b>\n"
             "• <code>/ban [ɪᴅ1] [ɪᴅ2]</code>\n"
             "• <code>/ban [ɪᴅ1],[ɪᴅ2]</code>",
-            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔒 ᴄʟᴏsᴇ", callback_data="close", style=ButtonStyle.DANGER)]])
+            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔒 ᴄʟᴏsᴇ", callback_data="close", style="danger", icon_custom_emoji_id=5354968347094046619)]])
         )
 
     banusers = raw_users[0].replace(",", " ").split()
@@ -68,7 +68,7 @@ async def ban_user_cmd(client: Client, message: Message):
         report += f"✅ Bᴀɴɴᴇᴅ: <code>{uid_int}</code>\n"
         success_count += 1
 
-    await pro.edit(f"📊 **Bᴀɴ Rᴇᴘᴏʀᴛ:**\n\n{report}", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("❌ Cʟᴏsᴇ", callback_data="close", style=ButtonStyle.DANGER)]]))
+    await pro.edit(f"📊 **Bᴀɴ Rᴇᴘᴏʀᴛ:**\n\n{report}", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("❌ Cʟᴏsᴇ", callback_data="close", style="danger", icon_custom_emoji_id=5354968347094046619)]]))
 
 @Client.on_message(filters.command('unban') & filters.private & admin)
 async def unban_user_cmd(client: Client, message: Message):
@@ -83,7 +83,7 @@ async def unban_user_cmd(client: Client, message: Message):
             "📜 <b>ᴜsᴀɢᴇ:</b>\n"
             "• <code>/unban [ɪᴅ1],[ɪᴅ2]</code>\n"
             "• <code>/unban all</code>",
-            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔒 ᴄʟᴏsᴇ", callback_data="close", style=ButtonStyle.DANGER)]])
+            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔒 ᴄʟᴏsᴇ", callback_data="close", style="danger", icon_custom_emoji_id=5354968347094046619)]])
         )
 
     if raw_users[0].lower() == "all":
@@ -106,7 +106,7 @@ async def unban_user_cmd(client: Client, message: Message):
         except:
             report += f"⚠️ Iɴᴠᴀʟɪᴅ ID: <code>{uid}</code>\n"
 
-    await pro.edit(f"📊 **Uɴʙᴀɴ Rᴇᴘᴏʀᴛ:**\n\n{report}", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("❌ Cʟᴏsᴇ", callback_data="close", style=ButtonStyle.DANGER)]]))
+    await pro.edit(f"📊 **Uɴʙᴀɴ Rᴇᴘᴏʀᴛ:**\n\n{report}", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("❌ Cʟᴏsᴇ", callback_data="close", style="danger", icon_custom_emoji_id=5354968347094046619)]]))
 
 @Client.on_message(filters.command('banlist') & filters.private & admin)
 async def ban_list_cmd(client: Client, message: Message):
@@ -114,7 +114,7 @@ async def ban_list_cmd(client: Client, message: Message):
     banuser_ids = await db.get_ban_users()
 
     if not banuser_ids:
-        return await pro.edit("✨ <b>˹ ʙᴀɴ ʟɪsᴛ ᴇᴍᴘᴛʏ ˼</b>", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔒 ᴄʟᴏsᴇ", callback_data="close", style=ButtonStyle.DANGER)]]))
+        return await pro.edit("✨ <b>˹ ʙᴀɴ ʟɪsᴛ ᴇᴍᴘᴛʏ ˼</b>", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔒 ᴄʟᴏsᴇ", callback_data="close", style="danger", icon_custom_emoji_id=5354968347094046619)]]))
 
     result = "🚫 <b>˹ ʙᴀɴɴᴇᴅ ᴜsᴇʀs ˼</b>\n\n"
     for uid in banuser_ids:
@@ -126,7 +126,7 @@ async def ban_list_cmd(client: Client, message: Message):
         except:
             result += f"• <code>{uid}</code> — <i>Could not fetch name</i>\n"
 
-    await pro.edit(result, disable_web_page_preview=True, reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("❌ Cʟᴏsᴇ", callback_data="close", style=ButtonStyle.DANGER)]]))
+    await pro.edit(result, disable_web_page_preview=True, reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("❌ Cʟᴏsᴇ", callback_data="close", style="danger", icon_custom_emoji_id=5354968347094046619)]]))
 
 @Client.on_message(filters.command('banned_users') & filters.private & admin)
 async def banned_users_list_cmd(client: Client, message: Message):
@@ -134,7 +134,7 @@ async def banned_users_list_cmd(client: Client, message: Message):
     banned_users = await db.get_all_banned_users()
 
     if not banned_users:
-        return await pro.edit("✨ <b>˹ ʙᴀɴ ʟɪsᴛ ᴇᴍᴘᴛʏ ˼</b>", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔒 ᴄʟᴏsᴇ", callback_data="close", style=ButtonStyle.DANGER)]]))
+        return await pro.edit("✨ <b>˹ ʙᴀɴ ʟɪsᴛ ᴇᴍᴘᴛʏ ˼</b>", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔒 ᴄʟᴏsᴇ", callback_data="close", style="danger", icon_custom_emoji_id=5354968347094046619)]]))
 
     result = "🚫 <b>˹ ʙᴀɴɴᴇᴅ ᴜsᴇʀs ᴅᴀᴛᴀ ˼</b>\n\n"
     for i, user_data in enumerate(banned_users, 1):
@@ -156,7 +156,7 @@ async def banned_users_list_cmd(client: Client, message: Message):
             result = ""
 
     if result:
-        await pro.edit(result, disable_web_page_preview=True, reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("❌ Cʟᴏsᴇ", callback_data="close", style=ButtonStyle.DANGER)]]))
+        await pro.edit(result, disable_web_page_preview=True, reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("❌ Cʟᴏsᴇ", callback_data="close", style="danger", icon_custom_emoji_id=5354968347094046619)]]))
     else:
         await pro.delete()
 

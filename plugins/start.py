@@ -25,7 +25,7 @@ from datetime import datetime, timedelta
 from pyrogram import Client, filters, __version__
 from pyrogram.enums import ParseMode, ChatAction
 from pyrogram.types import Message, InlineKeyboardMarkup, CallbackQuery, ReplyKeyboardMarkup, ChatInviteLink, ChatPrivileges, WebAppInfo
-from helper_func import InlineKeyboardButton, random_button_style, ButtonStyle
+from helper_func import InlineKeyboardButton, random_button_style
 from pyrogram.errors import FloodWait, UserIsBlocked, InputUserDeactivated, UserNotParticipant, MessageNotModified
 from config import *
 from pytz import timezone
@@ -113,7 +113,7 @@ async def send_verify_log(event_type: str, user_id: int, user_obj, session_id: s
             "━━━━━━━━━━━━━━━━━━━━━━━━"
         )
         markup = InlineKeyboardMarkup([
-            [InlineKeyboardButton("🗑️ Delete Verification", callback_data=f"del_ver_{user_id}_{bot_username}", style=ButtonStyle.DANGER)]
+            [InlineKeyboardButton("🗑️ Delete Verification", callback_data=f"del_ver_{user_id}_{bot_username}", style="danger", icon_custom_emoji_id=5354968347094046619)]
         ])
 
     for d in dests:
@@ -503,7 +503,7 @@ async def send_files(client: Client, user_id: int, base64_string, messages=None,
                     try:
                         reload_url = f"https://t.me/{cli.username}?start={reload_payload}"
                         keyboard = InlineKeyboardMarkup(
-                            [[InlineKeyboardButton("⚡️ ˹ ʀᴇᴄᴏᴠᴇʀ ꜰɪʟᴇ ˼ ⚡️", url=reload_url, style=ButtonStyle.PRIMARY)]]
+                            [[InlineKeyboardButton("⚡️ ˹ ʀᴇᴄᴏᴠᴇʀ ꜰɪʟᴇ ˼ ⚡️", url=reload_url, style="primary", icon_custom_emoji_id=5440389890787281213)]]
                         )
 
                         await notification_msg.edit(
@@ -705,23 +705,23 @@ async def short_url(client: Client, message: Message, base64_string, anim_msg=No
 
     if not verification_enabled or verification_method in ["mini_app", "browser"]:
         buttons = [
-            [InlineKeyboardButton("✅ Verify Now", web_app=WebAppInfo(url=final_redirect), style=ButtonStyle.PRIMARY)]
+            [InlineKeyboardButton("✅ Verify Now", web_app=WebAppInfo(url=final_redirect), style="primary", icon_custom_emoji_id=5440389890787281213)]
         ]
     else:
         buttons = [
-            [InlineKeyboardButton("✅ Verify Now", url=final_redirect, style=ButtonStyle.PRIMARY)]
+            [InlineKeyboardButton("✅ Verify Now", url=final_redirect, style="primary", icon_custom_emoji_id=5440389890787281213)]
         ]
 
     tut_link = settings.get("tutorial_link", TUT_VID)
     tut_enabled = settings.get("tutorial_enabled", True)
     if tut_enabled and tut_link:
-        buttons.append([InlineKeyboardButton("📹 Tutorial", url=tut_link, style=ButtonStyle.SECONDARY)])
+        buttons.append([InlineKeyboardButton("📹 Tutorial", url=tut_link, style="primary", icon_custom_emoji_id=5440389890787281213)])
 
     buttons.append([
         InlineKeyboardButton(
             "✅ I Have Verified",
             url=f"https://t.me/{client.username}?start={base64_string}",
-            style=ButtonStyle.SUCCESS
+            style="success", icon_custom_emoji_id=5355142851615283756
         )
     ])
 
@@ -817,8 +817,8 @@ async def ping_command(client: Client, message: Message):
 async def help_command(client: Client, message: Message):
     # help_command logic
     buttons = [
-        [InlineKeyboardButton('ʜᴏᴍᴇ', callback_data='start', style=ButtonStyle.SECONDARY),
-         InlineKeyboardButton("ᴄʟᴏꜱᴇ", callback_data='close', style=ButtonStyle.DANGER)]
+        [InlineKeyboardButton('ʜᴏᴍᴇ', callback_data='start', style="primary", icon_custom_emoji_id=5440389890787281213),
+         InlineKeyboardButton("ᴄʟᴏꜱᴇ", callback_data='close', style="danger", icon_custom_emoji_id=5354968347094046619)]
     ]
     await message.reply_text(
         text=HELP_TXT.format(first=message.from_user.first_name),
@@ -930,18 +930,18 @@ async def proverify_command(client: Client, message: Message):
         # Build beautiful UI message
         if not verification_enabled or verification_method in ["mini_app", "browser"]:
             buttons = [
-                [InlineKeyboardButton("🔗 ᴘʀᴏ ᴠᴇʀɪꜰʏ", web_app=WebAppInfo(url=final_redirect), style=ButtonStyle.PRIMARY)]
+                [InlineKeyboardButton("🔗 ᴘʀᴏ ᴠᴇʀɪꜰʏ", web_app=WebAppInfo(url=final_redirect), style="primary", icon_custom_emoji_id=5440389890787281213)]
             ]
         else:
             buttons = [
-                [InlineKeyboardButton("🔗 ᴘʀᴏ ᴠᴇʀɪꜰʏ", url=final_redirect, style=ButtonStyle.PRIMARY)]
+                [InlineKeyboardButton("🔗 ᴘʀᴏ ᴠᴇʀɪꜰʏ", url=final_redirect, style="primary", icon_custom_emoji_id=5440389890787281213)]
             ]
 
         buttons.append([
             InlineKeyboardButton(
                 "✅ ɪ ʜᴀᴠᴇ ᴠᴇʀɪꜰɪᴇᴅ",
                 url=f"https://t.me/{client.username}?start=verify_{session_id}",
-                style=ButtonStyle.SUCCESS
+                style="success", icon_custom_emoji_id=5355142851615283756
             )
         ])
 
@@ -1044,23 +1044,23 @@ async def verify_command(client: Client, message: Message):
     # Build beautiful UI message
     if not verification_enabled or verification_method in ["mini_app", "browser"]:
         buttons = [
-            [InlineKeyboardButton("🔗 ᴠᴇʀɪꜰʏ / ᴇxᴛᴇɴᴅ", web_app=WebAppInfo(url=final_redirect), style=ButtonStyle.PRIMARY)]
+            [InlineKeyboardButton("🔗 ᴠᴇʀɪꜰʏ / ᴇxᴛᴇɴᴅ", web_app=WebAppInfo(url=final_redirect), style="primary", icon_custom_emoji_id=5440389890787281213)]
         ]
     else:
         buttons = [
-            [InlineKeyboardButton("🔗 ᴠᴇʀɪꜰʏ / ᴇxᴛᴇɴᴅ", url=final_redirect, style=ButtonStyle.PRIMARY)]
+            [InlineKeyboardButton("🔗 ᴠᴇʀɪꜰʏ / ᴇxᴛᴇɴᴅ", url=final_redirect, style="primary", icon_custom_emoji_id=5440389890787281213)]
         ]
 
     tut_link = settings.get("tutorial_link", TUT_VID)
     tut_enabled = settings.get("tutorial_enabled", True)
     if tut_enabled and tut_link:
-        buttons.append([InlineKeyboardButton("📹 ᴛᴜᴛᴏʀɪᴀʟ", url=tut_link, style=ButtonStyle.SECONDARY)])
+        buttons.append([InlineKeyboardButton("📹 ᴛᴜᴛᴏʀɪᴀʟ", url=tut_link, style="primary", icon_custom_emoji_id=5440389890787281213)])
 
     buttons.append([
         InlineKeyboardButton(
             "✅ ɪ ʜᴀᴠᴇ ᴠᴇʀɪꜰɪᴇᴅ",
             url=f"https://t.me/{client.username}?start=verify_{session_id}",
-            style=ButtonStyle.SUCCESS
+            style="success", icon_custom_emoji_id=5355142851615283756
         )
     ])
 
@@ -1287,7 +1287,7 @@ async def start_command(client: Client, message: Message):
                 "<i>ʀᴇᴊᴏɪɴ ᴀʟʟ ʀᴇǫᴜɪʀᴇᴅ ᴄʜᴀɴɴᴇʟs/ɢʀᴏᴜᴘs ᴀɴᴅ ᴄᴏɴᴛᴀᴄᴛ ᴛʜᴇ ᴏᴡɴᴇʀ ꜰᴏʀ ʀᴇᴠɪᴇᴡ.</i>\n\n"
                 "⚠️ ᴛʜɪs ᴀᴄᴛɪᴏɴ ɪs ᴀᴜᴛᴏᴍᴀᴛɪᴄ ᴀɴᴅ ᴛʀɪɢɢᴇʀᴇᴅ ɪᴍᴍᴇᴅɪᴀᴛᴇʟʏ ᴡʜᴇɴ ᴀ ᴠɪᴏʟᴀᴛɪᴏɴ ɪs ᴅᴇᴛᴇᴄᴛᴇᴅ.",
                 reply_markup=InlineKeyboardMarkup(
-                    [[InlineKeyboardButton("🛡 ᴄᴏɴᴛᴀᴄᴛ ᴏᴡɴᴇʀ 🛡", url="https://t.me/ALONEKINGSTARBACK", style=ButtonStyle.PRIMARY)]]
+                    [[InlineKeyboardButton("🛡 ᴄᴏɴᴛᴀᴄᴛ ᴏᴡɴᴇʀ 🛡", url="https://t.me/ALONEKINGSTARBACK", style="primary", icon_custom_emoji_id=5440389890787281213)]]
                 )
             )
         elif access_status == "maintenance":
@@ -1591,14 +1591,14 @@ async def start_command(client: Client, message: Message):
         banners = await get_banners(client)
 
         buttons = [
-            [InlineKeyboardButton(f"📢 {bot_name}: JOIN OUR COMMUNITY", url=community_url, style=ButtonStyle.PRIMARY)],
+            [InlineKeyboardButton(f"📢 {bot_name}: JOIN OUR COMMUNITY", url=community_url, style="primary", icon_custom_emoji_id=5440389890787281213)],
             [
-                InlineKeyboardButton("⚙️ ˹ ᴀʙᴏᴜᴛ ˼", callback_data="about", style=ButtonStyle.SECONDARY),
-                InlineKeyboardButton("✨ ˹ ʜᴇʟᴘ ˼", callback_data="help", style=ButtonStyle.SECONDARY)
+                InlineKeyboardButton("⚙️ ˹ ᴀʙᴏᴜᴛ ˼", callback_data="about", style="primary", icon_custom_emoji_id=5440389890787281213),
+                InlineKeyboardButton("✨ ˹ ʜᴇʟᴘ ˼", callback_data="help", style="primary", icon_custom_emoji_id=5440389890787281213)
             ],
             [
-                InlineKeyboardButton("💎 ˹ ᴘʀᴇᴍɪᴜᴍ ˼", callback_data="premium", style=ButtonStyle.SUCCESS),
-                InlineKeyboardButton("🤝 ˹ ʀᴇꜰᴇʀ ˼", callback_data="referral_info", style=ButtonStyle.SECONDARY)
+                InlineKeyboardButton("💎 ˹ ᴘʀᴇᴍɪᴜᴍ ˼", callback_data="premium", style="success", icon_custom_emoji_id=5355142851615283756),
+                InlineKeyboardButton("🤝 ˹ ʀᴇꜰᴇʀ ˼", callback_data="referral_info", style="primary", icon_custom_emoji_id=5440389890787281213)
             ]
         ]
 
@@ -2152,7 +2152,7 @@ async def referral_info_cb(client, query: CallbackQuery):
     )
     await query.message.edit_caption(
         caption=text,
-        reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back", callback_data="start", style=ButtonStyle.SECONDARY)]])
+        reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back", callback_data="start", style="primary", icon_custom_emoji_id=5440389890787281213)]])
     )
 
 @Client.on_message(filters.command('commands') & filters.private & admin)
@@ -2166,7 +2166,7 @@ async def bcmd(client: Client, message: Message):
         for cmd in commands:
             text += f"• `/{cmd.command}` - {cmd.description}\n"
 
-    reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("• ᴄʟᴏsᴇ •", callback_data = "close", style=ButtonStyle.DANGER)]])
+    reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("• ᴄʟᴏsᴇ •", callback_data = "close", style="danger", icon_custom_emoji_id=5354968347094046619)]])
     await message.reply(text=text, reply_markup = reply_markup, quote= True)
 
 
@@ -2188,7 +2188,7 @@ async def access_control(client: Client, message: Message):
             "<i>ʀᴇᴊᴏɪɴ ᴀʟʟ ʀᴇǫᴜɪʀᴇᴅ ᴄʜᴀɴɴᴇʟs/ɢʀᴏᴜᴘs ᴀɴᴅ ᴄᴏɴᴛᴀᴄᴛ ᴛʜᴇ ᴏᴡɴᴇʀ ꜰᴏʀ ʀᴇᴠɪᴇᴡ.</i>\n\n"
             "⚠️ ᴛʜɪs ᴀᴄᴛɪᴏɴ ɪs ᴀᴜᴛᴏᴍᴀᴛɪᴄ ᴀɴᴅ ᴛʀɪɢɢᴇʀᴇᴅ ɪᴍᴍᴇᴅɪᴀᴛᴇʟʏ ᴡʜᴇɴ ᴀ ᴠɪᴏʟᴀᴛɪᴏɴ ɪs ᴅᴇᴛᴇᴄᴛᴇᴅ.",
             reply_markup=InlineKeyboardMarkup(
-                [[InlineKeyboardButton("🛡 ᴄᴏɴᴛᴀᴄᴛ ᴏᴡɴᴇʀ 🛡", url="https://t.me/ALONEKINGSTARBACK", style=ButtonStyle.PRIMARY)]]
+                [[InlineKeyboardButton("🛡 ᴄᴏɴᴛᴀᴄᴛ ᴏᴡɴᴇʀ 🛡", url="https://t.me/ALONEKINGSTARBACK", style="primary", icon_custom_emoji_id=5440389890787281213)]]
             )
         )
         message.stop_propagation()
