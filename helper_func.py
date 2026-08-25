@@ -486,16 +486,23 @@ async def get_messages(client, message_ids, chat_id=None):
     messages = []
     total_messages = 0
 
-    # Get all DB channels for this specific bot if chat_id not provided
+    db_channels = []
     if chat_id:
-        db_channels = [chat_id]
-    else:
-        db_channels = await db.get_all_db_channels(client.username)
-        if not db_channels:
-            if hasattr(client, 'db_channel') and client.db_channel:
-                db_channels = [client.db_channel.id]
-            elif hasattr(client, 'db_channel_id') and client.db_channel_id:
-                db_channels = [client.db_channel_id]
+        db_channels.append(chat_id)
+
+    bot_uname = getattr(client, "username", None)
+    if bot_uname:
+        known_channels = await db.get_all_db_channels(bot_uname)
+        for c in known_channels:
+            if c and c not in db_channels:
+                db_channels.append(c)
+
+    if hasattr(client, 'db_channel') and client.db_channel and client.db_channel.id not in db_channels:
+        db_channels.append(client.db_channel.id)
+    if hasattr(client, 'db_channel_id') and client.db_channel_id and client.db_channel_id not in db_channels:
+        db_channels.append(client.db_channel_id)
+    if CHANNEL_ID and CHANNEL_ID not in db_channels:
+        db_channels.append(CHANNEL_ID)
 
     if not db_channels:
         return []
@@ -839,12 +846,16 @@ def style_text_safely(text):
 
 async def patched_send_message(self, chat_id, text, *args, **kwargs):
     if text:
-        text = style_text_safely(text)
+        try:
+            text = style_text_safely(text)
+        except Exception as e:
+            print(f"[UI ENHANCER ERROR] Exception in style_text_safely: {e}")
 
         # Check if we should convert to a beautiful media banner
         is_admin_or_system = False
-        text_lower = text.lower()
-        if "system logs" in text_lower or "database" in text_lower or "active tasks" in text_lower or "username:" in text_lower or "user id:" in text_lower or "total count" in text_lower or len(text) > 1000:
+        text_str = str(text)
+        text_lower = text_str.lower()
+        if "system logs" in text_lower or "database" in text_lower or "active tasks" in text_lower or "username:" in text_lower or "user id:" in text_lower or "total count" in text_lower or len(text_str) > 1000:
             is_admin_or_system = True
 
         if not is_admin_or_system:
@@ -878,8 +889,19 @@ async def patched_send_message(self, chat_id, text, *args, **kwargs):
             except Exception as e:
                 print(f"[MONKEYPATCH ERROR] Failed to send banner, falling back to text: {e}")
 
-    # Fallback to standard text message
-    return await orig_send_message(self, chat_id, text, *args, **kwargs)
+    # Fallback to standard text message safely
+    try:
+        return await orig_send_message(self, chat_id, text, *args, **kwargs)
+    except Exception as e:
+        print(f"[MONKEYPATCH ERROR] Standard send_message failed: {e}")
+        try:
+            # Attempt plain text delivery without custom formatting if HTML parse fails
+            kwargs.pop("parse_mode", None)
+            clean_text = re.sub(r'<[^>]*>', '', str(text)) if text else ""
+            return await orig_send_message(self, chat_id, clean_text, *args, **kwargs)
+        except Exception as ex:
+            print(f"[MONKEYPATCH ERROR] Plain send_message fallback failed: {ex}")
+            return None
 
 async def patched_send_photo(self, chat_id, photo, caption=None, *args, **kwargs):
     if caption:

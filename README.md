@@ -1,189 +1,95 @@
 # Anizoneflix — High-Performance Secure Multi-Bot & Content Delivery System
 
-Anizoneflix is a production-ready, ultra-fast, and highly reliable Telegram Multi-Bot content delivery engine built in Python using Pyrogram (and compatible pyrofork/wzgram) and MongoDB. It secures, groups, and packages content files across primary and cloned DB channels into secure, shared, shareable file-sharing start tokens/links with advanced episode metadata detection.
+**Anizoneflix** is an enterprise-grade, high-performance Telegram Multi-Bot content delivery engine built with Python using Pyrogram (with Pyrogram / Pyrofork / Wzgram compatibility), FastAPI, and MongoDB Motor/PyMongo. It packages, secures, and delivers content across primary and clone database channels using shareable start tokens with automated quality and episode metadata detection.
 
 ---
 
-## 🚀 Key Features
+## ⚡ Key Highlights & Fixes
 
-- **Unified Shared Range/Link Engine**: Shares a core token parsing, range validation, and link generation engine across all commands.
-- **Robust Multi-Admin State Manager**: Session-isolated conversation manager with automatic inactivity cleanup. No fragile globals.
-- **Priority Metadata Extraction**: Captions are prioritized over filenames to capture full descriptive file names and complete HTML/Markdown original captions without truncation.
-- **Caption-First Episode Detection**: Seamless extraction of seasons, episodes, and parts from file names and captions. Includes sanitization of emojis, graphic symbols, and common noise like `1080p`, `x264`, and `2026`.
-- **Primary & Cloned DB Channel Mappings**: Automatically identifies which DB bot/channel configuration owns the supplied message ranges and produces links under that specific bot's context.
+- **Resilient Multi-DB & ID Resolution**: Decodes both raw Telegram message IDs and channel-multiplied IDs seamlessly. Prevents file delivery failures and "requested files not found" errors when files exist in database channels.
+- **Unified Range & Link Engine**: Generates single file links, batch range links, list links, and auto-sorted episode groups across primary and cloned DB channels.
+- **Sequential FIFO Task Queue & Rate Throttling**: Features an in-memory lock and queue registry to prevent race conditions, lock blockages, and Telegram FloodWait errors.
+- **URL Verification Gate & Anti-Bypass**: Integrated shortener verification session system with countdown timer, access limits, and anti-bypass security lock.
+- **Caption-First Episode & Quality Detection**: Automatically parses quality (480P, 720P, 1080P), seasons, episodes, and parts from file captions and file names.
+- **Carousel & Media Streaming Support**: Interactive inline multi-file carousel delivery and streaming/download links for video files.
 
 ---
 
-## 🛠️ Installation & Quick Start
+## 🛠️ Installation & Setup
 
 ### 1. Prerequisites
-- Python 3.10+
-- MongoDB instance (Atlas or Local)
-- Telegram App API ID and API Hash
+- Python 3.10 or higher
+- MongoDB Instance (MongoDB Atlas or Local MongoDB)
+- Telegram App `API_ID` and `API_HASH` from [my.telegram.org](https://my.telegram.org)
+- Telegram Bot Token from [@BotFather](https://t.me/BotFather)
 
-### 2. Local Setup
-Clone the repository and install all required dependencies:
+### 2. Quick Local Setup
 ```bash
+# Clone the repository
 git clone https://github.com/AniZoneFlix/Anizoneflix.git
 cd Anizoneflix
+
+# Install dependencies
 pip install -r requirements.txt
-```
 
-### 3. Environment Variables
-Create a `.env` file in the repository root:
-```env
-TG_BOT_TOKEN=8672264237:AAG...
-APP_ID=22266643
-API_HASH=7d0b85b4146034511b8776ed7ff99de4
-CHANNEL_ID=-1003748914288
-OWNER_ID=8646416973
-DATABASE_URL=mongodb+srv://...
-DATABASE_NAME=AniZoneFlix_Bot
-```
+# Run unit tests to verify installation
+python3 test_new_features.py
+python3 test_search_collect.py
 
-### 4. Run the Bot
-```bash
-python main.py
+# Launch the bot engine
+python3 main.py
 ```
 
 ---
 
-## ⚙️ DB Bot / Cloned Channels Mapping
+## ⚙️ Environment Variables
 
-Each clone bot can manage its own unique database channels. Primary and clone DB bots can be registered using `/dbchnl`.
-```
-DB Bot A  ──> DB Channel A (cid: -1004446716010)
-DB Bot B  ──> DB Channel B (cid: -1003903003195)
-```
-When an admin invokes an advanced range command (`/advbatch`) targeting `https://t.me/c/4446716010/...`, the core DB resolver detects the channel, resolves the owner to DB Bot A, and initiates links on behalf of DB Bot A.
+Create a `.env` file in the root directory:
 
----
-
-## 📦 Admin Commands Reference
-
-All commands listed below are restricted strictly to configured bot admins and the system owner. Unauthorized requests receive a clean `Access Denied` permission message and abort instantly.
-
-All commands support **Reply Mode**: replying to any message containing Telegram links will automatically extract and process them.
-
-### 1. `/genlink`
-Generates a secure, protected single file-store start link.
-- **Syntax**: `/genlink [link]` or `/genlink [link1] [link2] ...` (supports Bulk mode)
-- **Single Example**: `/genlink https://t.me/c/4446716010/37150`
-- **Bulk Example**:
-  ```
-  /genlink https://t.me/c/4446716010/37150
-  https://t.me/c/4446716010/37151
-  ```
-- **Expected Output**:
-  ```
-  ╭─── ✦ LINK GENERATED ✦ ───╮
-
-  Original Link:
-  https://t.me/c/4446716010/37150
-
-  Filename:
-  Naruto Shippuden S01E01 Uncut
-
-  Filecaption:
-  Naruto Shippuden - S01E01 - Complete Episode Dual Audio
-
-  🔗 Link:
-  `https://t.me/AniZoneFlix_Bot?start=get-3715000000`
-
-  ╰──────────────────────────╯
-  ```
+| Variable | Description | Default / Example |
+| :--- | :--- | :--- |
+| `TG_BOT_TOKEN` | Primary Telegram Bot Token from BotFather | `8672264237:AAG...` |
+| `APP_ID` | Telegram App API ID | `22266643` |
+| `API_HASH` | Telegram API Hash | `7d0b85b4146034511b8776ed7ff99de4` |
+| `CHANNEL_ID` | Default Main Database Channel ID | `-1003748914288` |
+| `OWNER_ID` | Telegram Numeric User ID of System Owner | `8646416973` |
+| `DATABASE_URL` | MongoDB Connection URI | `mongodb+srv://...` |
+| `DATABASE_NAME` | MongoDB Database Name | `AniZoneFlix_Bot` |
+| `PORT` | Web Server Port for FastAPI / Health Checks | `8080` |
+| `WEBSITE_URL` | Domain URL for Web Verification Gate & Streaming | `https://your-domain.com` |
+| `SHORTENER_URL` | Default Shortener Domain | `arolinks.com` |
+| `SHORTENER_API_KEY` | Default Shortener API Key | `your_api_key` |
 
 ---
 
-### 2. `/batch`
-Packages a range of contiguous messages into a single shareable link.
-- **Syntax**: `/batch [start_link]-[end_link]` or `/batch [start_link]-[end_msg_id]` (Short Range format)
-- **Single Range Example**: `/batch https://t.me/c/4446716010/22294-https://t.me/c/4446716010/22341`
-- **Short Range Example**: `/batch https://t.me/c/4446716010/22294-22341`
-- **Expected Output**:
-  ```
-  ╭─── ✦ BATCH GENERATED ✦ ───╮
+## 🤖 Bot Commands Reference
 
-  Original RANGE Link:
-  https://t.me/c/4446716010/22294-22341
+### 👤 User Commands
+- `/start` — Initialize or restart the bot / process start payload link.
+- `/help` — Display center guidance and available commands.
+- `/verify` — Check verification status or generate a new verification session.
+- `/mystatus` — View active verification and premium membership countdown timer.
+- `/id` — Get your Telegram user ID and group/channel chat IDs.
+- `/ping` — Check bot response latency.
 
-  FIRST Filename:
-  Naruto Shippuden S01E01
-
-  FIRST Filecaption:
-  Naruto Shippuden - S01E01 - Enter Naruto Uzumaki!
-
-  LAST FILENAME:
-  Naruto Shippuden S01E12
-
-  LAST FILECAPTION:
-  Naruto Shippuden - S01E12 - Battle on the Bridge!
-
-  🔗 Link:
-  `https://t.me/AniZoneFlix_Bot?start=get-2229400000-2234100000`
-
-  ╰──────────────────────────╯
-  ```
+### 👑 Admin Commands
+- `/genlink` — Generate a single or bulk secure start link.
+- `/batch` — Package a range of contiguous messages into a single batch link.
+- `/auto_batch` — Automatically group and batch files by quality and episode range.
+- `/cbatch` — Split range into custom episode/message batches.
+- `/advbatch` — Advanced multi-channel/clone auto-batch scanner and link generator.
+- `/addpremium` — Grant premium access duration to users (`/addpremium user_id 30 d`).
+- `/remove_premium` — Revoke premium access from specified users.
+- `/premium_users` — List active premium users and remaining expiration time.
+- `/addchnl` — Add required force-subscription channel.
+- `/delchnl` — Remove force-subscription channel.
+- `/listchnl` — List all force-subscription channels.
+- `/fsub_mode` — Toggle force-sub approval request mode (`on`/`off`).
+- `/count` — View today's total verification statistics and user counts.
+- `/proverify` — Generate a pro verification session bypassing single-user locks.
 
 ---
 
-### 3. `/auto_batch`
-Intelligently scan a contiguous range, detect episodes, and sort/group them into discrete chunks by quality.
-- **Syntax**: `/auto_batch [range]` (Supports multiple ranges for bulk queueing)
-- **Workflow**:
-  1. Admin invokes `/auto_batch https://t.me/c/4446716010/22294-22341`.
-  2. Bot sends a new message asking: `How many episodes should be included in total?` (Admin types: `12`).
-  3. Bot sends a new message asking: `Send the anime name:` (Admin types: `Naruto`).
-  4. Once confirmed via confirmation buttons, task is added to the sequential FIFO worker queue.
-- **Episode Detection Priorities & Patterns**:
-  - Priority 1: File Caption. Priority 2: Filename fallback.
-  - Supported: `S01E01`, `E01`, `EP01`, `Episode 1`, `Marriagetoxin S02 pt3`.
-  - Cleans spaces, punctuation, underscores (`_`), dashes (`-`), and strip-ignores graphic symbols and common keywords (`1080p`, `x264`, `hevc`).
-- **Expected Output**:
-  ```
-  🎬 Quality: 1080P
-  📦 Range: 1 → 12
-  FIRST Caption: Naruto Shippuden S01E01 Uncut 1080p
-  LAST Caption: Naruto Shippuden S01E12 1080p
-  🔗 Link: `https://t.me/AniZoneFlix_Bot?start=get-222940000-223410000`
-  ```
+## 📄 License & Credits
 
----
-
-### 4. `/cbatch`
-Divides a single large range into custom batches as specified by the admin.
-- **Syntax**: `/cbatch [range]`
-- **Workflow**:
-  1. Admin enters `/cbatch https://t.me/c/4446716010/22294-22341`.
-  2. Bot sends a message prompting: `Send custom ranges in this format: 1-12,13-79`.
-  3. Admin sends: `22294-22300,22301-22341`.
-- **Expected Output**:
-  Generates discrete batch blocks and separate start links for each custom range.
-
----
-
-### 5. `/advbatch`
-Advanced version of `/auto_batch`.
-- **Difference from `/auto_batch`**:
-  - `/auto_batch` is bound to the current bot's configured default channels.
-  - `/advbatch` parses multiple channels/clones DB links, determines the owning bot configuration using mapping lookups, uses that clone bot's client session for scanning, and generates links targeting that clone bot!
-- **Bulk workflow**:
-  Sequentially collects total episodes count and anime name for each provided bulk range, presents a combined summary, then starts concurrent parallel operations within safety rate limits.
-
----
-
-## ⚠️ Robust Error Handling & Validation
-
-Admins will never receive raw python traceback blocks. All standard errors are mapped gracefully:
-- **Invalid Link**: `❌ Invalid Telegram Link. Please use a valid format like: https://t.me/channel/123`
-- **Message Inaccessible**: `❌ Unable to access message. The message may be deleted, restricted, or inaccessible.`
-- **Empty Range**: `❌ No valid messages were found in this range.`
-- **DB Resolution Fail**: `❌ No configured DB bot or channel was found for this source.`
-
----
-
-## ⚡ Performance Optimization
-
-1. **Sequential Message Chunking**: Large ranges are fetched in chunked blocks of 50 messages to keep memory and API execution light.
-2. **Smooth Throttling Delay**: Small sleeps (0.02s per message, 0.1s between chunks) protect the bot against flood wait exceptions during heavy auto batch runs.
-3. **FIFO Serialization Worker**: Tasks are queued in an in-memory queue to guarantee the event loop is never blocked and tasks complete successfully without race conditions.
+Released under the MIT License. Copyright (C) 2025 by **AniZoneFlix**.
