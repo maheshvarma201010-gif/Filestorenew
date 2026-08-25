@@ -1078,6 +1078,39 @@ def patched_on_message(self, filters=None, group=0):
 Client.on_message = patched_on_message
 
 
+# Patch telebot (pyTelegramBotAPI) to support direct string styles and icon_custom_emoji_id
+try:
+    import telebot
+    orig_telebot_button_init = telebot.types.InlineKeyboardButton.__init__
+    orig_telebot_button_to_dict = telebot.types.InlineKeyboardButton.to_dict
+
+    def patched_telebot_button_init(self, text, *args, style=None, icon_custom_emoji_id=None, **kwargs):
+        orig_telebot_button_init(self, text, *args, **kwargs)
+        if icon_custom_emoji_id is None:
+            icon_custom_emoji_id = DEFAULT_CUSTOM_EMOJI_ID
+
+        if isinstance(style, str) and style in ["primary", "success", "danger"]:
+            style_str = style
+        else:
+            style_str = "primary"
+
+        self.style = style_str
+        self.icon_custom_emoji_id = icon_custom_emoji_id
+
+    def patched_telebot_button_to_dict(self):
+        d = orig_telebot_button_to_dict(self)
+        if hasattr(self, 'style') and self.style:
+            d['style'] = self.style
+        if hasattr(self, 'icon_custom_emoji_id') and self.icon_custom_emoji_id is not None:
+            d['icon_custom_emoji_id'] = self.icon_custom_emoji_id
+        return d
+
+    telebot.types.InlineKeyboardButton.__init__ = patched_telebot_button_init
+    telebot.types.InlineKeyboardButton.to_dict = patched_telebot_button_to_dict
+    print("[PATCH] Patched telebot.types.InlineKeyboardButton successfully.")
+except ImportError:
+    pass
+
 # Upgrade all InlineKeyboardButton and InlineKeyboardMarkup classes in all Pyrogram libraries
 import sys
 for pkg in ["pyrogram", "pyrofork", "wzgram"]:
