@@ -37,17 +37,17 @@ except ImportError:
     pass
 
 class ButtonStyle:
-    PRIMARY = getattr(PyrogramButtonStyle, "PRIMARY", "primary") if PyrogramButtonStyle else "primary"
-    SUCCESS = getattr(PyrogramButtonStyle, "SUCCESS", "success") if PyrogramButtonStyle else "success"
-    DANGER = getattr(PyrogramButtonStyle, "DANGER", "danger") if PyrogramButtonStyle else "danger"
-    DEFAULT = getattr(PyrogramButtonStyle, "DEFAULT", "default") if PyrogramButtonStyle else "default"
-    SECONDARY = PRIMARY
-    WARNING = SUCCESS
+    PRIMARY = "primary"
+    SUCCESS = "success"
+    DANGER = "danger"
+    DEFAULT = "primary"
+    SECONDARY = "primary"
+    WARNING = "success"
 
 SUPPORTED_STYLES = [
-    ButtonStyle.PRIMARY,
-    ButtonStyle.SUCCESS,
-    ButtonStyle.DANGER
+    "primary",
+    "success",
+    "danger"
 ]
 
 def random_button_style():
@@ -56,45 +56,58 @@ def random_button_style():
 class ColorInlineKeyboardButton(PyrogramInlineKeyboardButton):
     def __init__(self, text: str, *args, **kwargs):
         style = kwargs.pop("style", None)
+        icon_custom_emoji_id = kwargs.pop("icon_custom_emoji_id", None)
 
-        # Map new style names if explicitly passed
-        if style in ["bg_success", "bg_danger", "bg_primary"]:
-            if style == "bg_success":
-                style_enum = ButtonStyle.SUCCESS
-            elif style == "bg_danger":
-                style_enum = ButtonStyle.DANGER
+        if isinstance(style, str):
+            style_str = style.lower()
+            if style_str in ["primary", "success", "danger"]:
+                style_val = style_str
+            elif style_str == "secondary":
+                style_val = "primary"
+            elif style_str == "warning":
+                style_val = "success"
+            elif style_str.startswith("bg_"):
+                style_val = style_str.replace("bg_", "")
             else:
-                style_enum = ButtonStyle.PRIMARY
-        elif isinstance(style, ButtonStyle):
-            style_enum = style
+                style_val = "primary"
+        elif style is not None:
+            style_val = str(style).lower()
         else:
-            # Try to resolve other formats
-            style_str = str(style).upper() if style else ""
-            if hasattr(ButtonStyle, style_str):
-                style_enum = getattr(ButtonStyle, style_str)
+            text_lower = str(text).lower()
+            success_keywords = ["download", "get", "generate", "start", "continue", "confirm", "watch", "active", "verify", "yes"]
+            danger_keywords = ["delete", "remove", "cancel", "stop", "ban", "no", "close", "clear", "reset"]
+
+            if any(kw in text_lower for kw in success_keywords):
+                style_val = "success"
+            elif any(kw in text_lower for kw in danger_keywords):
+                style_val = "danger"
             else:
-                # Automatic Color Assignment based on button text
-                text_lower = str(text).lower()
-                success_keywords = ["download", "get", "generate", "start", "continue", "confirm", "watch", "active", "verify", "yes"]
-                danger_keywords = ["delete", "remove", "cancel", "stop", "ban", "no", "close", "clear", "reset"]
+                style_val = "primary"
 
-                if any(kw in text_lower for kw in success_keywords):
-                    style_enum = ButtonStyle.SUCCESS
-                elif any(kw in text_lower for kw in danger_keywords):
-                    style_enum = ButtonStyle.DANGER
-                else:
-                    style_enum = ButtonStyle.PRIMARY
+        self.style = style_val
+        if icon_custom_emoji_id is None:
+            icon_custom_emoji_id = 5440389890787281213
+        self.icon_custom_emoji_id = icon_custom_emoji_id
 
-        self.style = style_enum
+        extra_kwargs = {}
+        if style_val is not None:
+            extra_kwargs["style"] = style_val
+        if icon_custom_emoji_id is not None:
+            extra_kwargs["icon_custom_emoji_id"] = icon_custom_emoji_id
 
-        if style_enum is not None:
+        if extra_kwargs:
             try:
-                super().__init__(text, *args, style=style_enum, **kwargs)
+                super().__init__(text, *args, **extra_kwargs, **kwargs)
                 return
             except TypeError:
-                pass
-            except Exception:
-                pass
+                if "icon_custom_emoji_id" in extra_kwargs:
+                    extra_kwargs.pop("icon_custom_emoji_id")
+                if "style" in extra_kwargs:
+                    try:
+                        super().__init__(text, *args, style=extra_kwargs["style"], **kwargs)
+                        return
+                    except TypeError:
+                        pass
 
         super().__init__(text, *args, **kwargs)
 

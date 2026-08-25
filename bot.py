@@ -14,7 +14,8 @@
 import uvicorn
 import asyncio
 import pyromod.listen
-from pyrogram import Client
+from pyrogram import Client, filters
+import pyrogram.filters
 from pyrogram.types import BotCommand
 from pyrogram.enums import ParseMode
 import sys
@@ -22,6 +23,17 @@ import pytz
 from datetime import datetime
 #ᴀɴɪᴢᴏɴᴇꜰʟɪx on ᴛɢ
 from config import *
+
+# Patch Pyrogram command filter to accept /, ., |, \, and no prefix
+_orig_command = filters.command
+
+def _custom_command(commands, prefixes=COMMAND_PREFIXES, case_sensitive=False):
+    if prefixes == "/" or prefixes == ["/"]:
+        prefixes = COMMAND_PREFIXES
+    return _orig_command(commands, prefixes=prefixes, case_sensitive=case_sensitive)
+
+filters.command = _custom_command
+pyrogram.filters.command = _custom_command
 from database.db_premium import *
 from database.database import *
 from apscheduler.schedulers.asyncio import AsyncIOScheduler

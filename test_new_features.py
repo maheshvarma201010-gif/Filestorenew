@@ -319,6 +319,42 @@ class TestIdDecoder(unittest.TestCase):
         self.assertEqual(get_real_id(0), (None, None))
         self.assertEqual(get_real_id(None), (None, None))
 
+class TestCommandPrefixes(unittest.TestCase):
+    def test_command_prefixes(self):
+        import asyncio
+        import bot  # loads the patched pyrogram filters
+        from pyrogram import Client, filters
+        from pyrogram.types import Message, Chat, User
+
+        f = filters.command("start")
+
+        dummy_client = Client(name="test_prefix", api_id=123, api_hash="abc", bot_token="123:abc", in_memory=True)
+        dummy_client.me = User(id=1, is_bot=True, username="testbot")
+
+        test_cases = [
+            ("/start", True, ["start"]),
+            (".start", True, ["start"]),
+            ("|start", True, ["start"]),
+            ("\\start", True, ["start"]),
+            ("start", True, ["start"]),
+            ("start batch_123", True, ["start", "batch_123"]),
+            ("/start batch_123", True, ["start", "batch_123"]),
+            (".start batch_123", True, ["start", "batch_123"]),
+            ("|start batch_123", True, ["start", "batch_123"]),
+            ("\\start batch_123", True, ["start", "batch_123"]),
+            ("starting", False, None)
+        ]
+
+        async def run_tests():
+            for text, expected_match, expected_cmd in test_cases:
+                m = Message(id=1, text=text, chat=Chat(id=1, type="private"), from_user=User(id=2, first_name="User"))
+                res = await f(dummy_client, m)
+                self.assertEqual(bool(res), expected_match, f"Failed for text: {text}")
+                if expected_match:
+                    self.assertEqual(m.command, expected_cmd, f"Command mismatch for text: {text}")
+
+        asyncio.run(run_tests())
+
 class TestCrossBotLinkGeneration(unittest.TestCase):
     def test_get_start_link_and_list_link_custom_bot_username(self):
         import asyncio

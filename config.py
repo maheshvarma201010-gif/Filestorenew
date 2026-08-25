@@ -41,6 +41,7 @@ DB_NAME = getenv("DATABASE_NAME", BOT_USERNAME)
 FSUB_LINK_EXPIRY = int(getenv("FSUB_LINK_EXPIRY", "10"))  # 0 means no expiry
 BAN_SUPPORT = getenv("BAN_SUPPORT", "https://t.me/AniZoneFlix")
 TG_BOT_WORKERS = int(getenv("TG_BOT_WORKERS", "200"))
+COMMAND_PREFIXES = ['/', '.', '|', '\\', '']
 #--------------------------------------------
 # Random Anime Banners (Neon / Dark Theme)
 ANIME_BANNERS = [
