@@ -103,6 +103,42 @@ class InlineKeyboardMarkup(TelebotInlineKeyboardMarkup):
                 else:
                     self.add(row)
 
+    @property
+    def inline_keyboard(self):
+        return self.keyboard
+
+    async def write(self, client):
+        import pyrogram.raw as raw
+        rows = []
+        for r in self.keyboard:
+            buttons = []
+            for b in r:
+                buttons.append(await b.write(client))
+            rows.append(raw.types.KeyboardButtonRow(buttons=buttons))
+        return raw.types.ReplyInlineMarkup(rows=rows)
+
+async def _btn_write(self, client):
+    import pyrogram.raw as raw
+    if getattr(self, "callback_data", None) is not None:
+        data = bytes(self.callback_data, "utf-8") if isinstance(self.callback_data, str) else self.callback_data
+        return raw.types.KeyboardButtonCallback(text=self.text, data=data)
+    if getattr(self, "url", None) is not None:
+        return raw.types.KeyboardButtonUrl(text=self.text, url=self.url)
+    if getattr(self, "login_url", None) is not None:
+        return self.login_url.write(text=self.text, bot=await client.resolve_peer(self.login_url.bot_username or "self"))
+    if getattr(self, "user_id", None) is not None:
+        return raw.types.InputKeyboardButtonUserProfile(text=self.text, user_id=await client.resolve_peer(self.user_id))
+    if getattr(self, "switch_inline_query", None) is not None:
+        return raw.types.KeyboardButtonSwitchInline(text=self.text, query=self.switch_inline_query)
+    if getattr(self, "switch_inline_query_current_chat", None) is not None:
+        return raw.types.KeyboardButtonSwitchInline(text=self.text, query=self.switch_inline_query_current_chat, same_peer=True)
+    if getattr(self, "callback_game", None) is not None:
+        return raw.types.KeyboardButtonGame(text=self.text)
+    if getattr(self, "web_app", None) is not None:
+        return raw.types.KeyboardButtonWebView(text=self.text, url=self.web_app.url)
+
+TelebotInlineKeyboardButton.write = _btn_write
+
 import pyrogram.types
 pyrogram.types.InlineKeyboardButton = ColorInlineKeyboardButton
 pyrogram.types.InlineKeyboardMarkup = InlineKeyboardMarkup
@@ -156,8 +192,15 @@ async def get_banners(client=None):
 
 async def send_media(client, chat_id, photo, caption, reply_markup, message_effect_id=None):
     """Helper to send photo or video based on URL extension. Fallbacks to text if photo is empty."""
+    extra_kwargs = {}
+    if message_effect_id is not None:
+        extra_kwargs['message_effect_id'] = message_effect_id
+
     if not photo:
-        return await client.send_message(chat_id=chat_id, text=caption, reply_markup=reply_markup, message_effect_id=message_effect_id)
+        try:
+            return await client.send_message(chat_id=chat_id, text=caption, reply_markup=reply_markup, **extra_kwargs)
+        except TypeError:
+            return await client.send_message(chat_id=chat_id, text=caption, reply_markup=reply_markup)
 
     is_video = str(photo).lower().split('?')[0].endswith(('.mp4', '.mkv', '.webm'))
     try:
@@ -177,7 +220,10 @@ async def send_media(client, chat_id, photo, caption, reply_markup, message_effe
             )
     except Exception as e:
         print(f"Error in send_media: {e}")
-        return await client.send_message(chat_id=chat_id, text=caption, reply_markup=reply_markup, message_effect_id=message_effect_id)
+        try:
+            return await client.send_message(chat_id=chat_id, text=caption, reply_markup=reply_markup, **extra_kwargs)
+        except TypeError:
+            return await client.send_message(chat_id=chat_id, text=caption, reply_markup=reply_markup)
 
 #used for cheking if a user is admin ~Owner also treated as admin level
 async def check_admin(filter, client, update):
