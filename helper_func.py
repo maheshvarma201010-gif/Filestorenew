@@ -11,14 +11,17 @@ import urllib.parse
 import hashlib
 import random
 
+import telebot
+from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
+
 try:
     from pyrogram import filters
     from pyrogram.enums import ChatMemberStatus
-    from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton as PyrogramInlineKeyboardButton
+    from pyrogram.types import Message, InlineKeyboardMarkup as PyrogramInlineKeyboardMarkup, InlineKeyboardButton as PyrogramInlineKeyboardButton
 except ImportError:
     from pyrofork import filters
     from pyrofork.enums import ChatMemberStatus
-    from pyrofork.types import Message, InlineKeyboardMarkup, InlineKeyboardButton as PyrogramInlineKeyboardButton
+    from pyrofork.types import Message, InlineKeyboardMarkup as PyrogramInlineKeyboardMarkup, InlineKeyboardButton as PyrogramInlineKeyboardButton
 
 DEFAULT_CUSTOM_EMOJI_ID = 5440389890787281213
 
@@ -39,21 +42,70 @@ SUPPORTED_STYLES = [
 def random_button_style():
     return random.choice(SUPPORTED_STYLES)
 
-orig_ikm_init = InlineKeyboardMarkup.__init__
+orig_telebot_button_init = telebot.types.InlineKeyboardButton.__init__
+orig_telebot_button_to_dict = telebot.types.InlineKeyboardButton.to_dict
 
-def patched_ikm_init(self, inline_keyboard=None, *args, **kwargs):
+def patched_telebot_button_init(self, text, *args, style=None, icon_custom_emoji_id=None, **kwargs):
+    orig_telebot_button_init(self, text, *args, **kwargs)
+    if icon_custom_emoji_id is None:
+        icon_custom_emoji_id = DEFAULT_CUSTOM_EMOJI_ID
+
+    if isinstance(style, str) and style in ["primary", "success", "danger"]:
+        style_str = style
+    elif style in ["bg_success", "success"]:
+        style_str = "success"
+    elif style in ["bg_danger", "danger"]:
+        style_str = "danger"
+    else:
+        text_lower = str(text).lower()
+        success_keywords = ["download", "get", "generate", "start", "continue", "confirm", "watch", "active", "verify", "yes", "login"]
+        danger_keywords = ["delete", "remove", "cancel", "stop", "ban", "no", "close", "clear", "reset", "logout"]
+
+        if any(kw in text_lower for kw in success_keywords):
+            style_str = "success"
+        elif any(kw in text_lower for kw in danger_keywords):
+            style_str = "danger"
+        else:
+            style_str = "primary"
+
+    self.style = style_str
+    self.icon_custom_emoji_id = icon_custom_emoji_id
+
+def patched_telebot_button_to_dict(self):
+    d = orig_telebot_button_to_dict(self)
+    if hasattr(self, 'style') and self.style:
+        d['style'] = self.style
+    if hasattr(self, 'icon_custom_emoji_id') and self.icon_custom_emoji_id is not None:
+        d['icon_custom_emoji_id'] = self.icon_custom_emoji_id
+    return d
+
+telebot.types.InlineKeyboardButton.__init__ = patched_telebot_button_init
+telebot.types.InlineKeyboardButton.to_dict = patched_telebot_button_to_dict
+
+def telebot_ikm_row(self, *buttons):
+    if not hasattr(self, "keyboard") or self.keyboard is None:
+        self.keyboard = []
+    self.keyboard.append(list(buttons))
+    return self
+
+telebot.types.InlineKeyboardMarkup.row = telebot_ikm_row
+
+orig_pyrogram_ikm_init = PyrogramInlineKeyboardMarkup.__init__
+
+def patched_pyrogram_ikm_init(self, inline_keyboard=None, *args, **kwargs):
     if inline_keyboard is None:
         inline_keyboard = []
-    orig_ikm_init(self, inline_keyboard, *args, **kwargs)
+    orig_pyrogram_ikm_init(self, inline_keyboard, *args, **kwargs)
 
-def ikm_row(self, *buttons):
+def pyrogram_ikm_row(self, *buttons):
     if not hasattr(self, "inline_keyboard") or self.inline_keyboard is None:
         self.inline_keyboard = []
     self.inline_keyboard.append(list(buttons))
     return self
 
-InlineKeyboardMarkup.__init__ = patched_ikm_init
-InlineKeyboardMarkup.row = ikm_row
+ikm_row = pyrogram_ikm_row
+PyrogramInlineKeyboardMarkup.__init__ = patched_pyrogram_ikm_init
+PyrogramInlineKeyboardMarkup.row = pyrogram_ikm_row
 
 class ColorInlineKeyboardButton(PyrogramInlineKeyboardButton):
     def __init__(self, text: str, *args, **kwargs):
@@ -63,30 +115,23 @@ class ColorInlineKeyboardButton(PyrogramInlineKeyboardButton):
         if icon_custom_emoji_id is None:
             icon_custom_emoji_id = DEFAULT_CUSTOM_EMOJI_ID
 
-        # Direct string styles: "primary", "success", "danger"
         if isinstance(style, str) and style in ["primary", "success", "danger"]:
             style_str = style
         elif style in ["bg_success", "success"]:
             style_str = "success"
         elif style in ["bg_danger", "danger"]:
             style_str = "danger"
-        elif style in ["bg_primary", "primary", "secondary", "default"]:
-            style_str = "primary"
         else:
-            style_str_raw = str(style).lower() if style else ""
-            if style_str_raw in ["primary", "success", "danger"]:
-                style_str = style_str_raw
-            else:
-                text_lower = str(text).lower()
-                success_keywords = ["download", "get", "generate", "start", "continue", "confirm", "watch", "active", "verify", "yes", "login"]
-                danger_keywords = ["delete", "remove", "cancel", "stop", "ban", "no", "close", "clear", "reset", "logout"]
+            text_lower = str(text).lower()
+            success_keywords = ["download", "get", "generate", "start", "continue", "confirm", "watch", "active", "verify", "yes", "login"]
+            danger_keywords = ["delete", "remove", "cancel", "stop", "ban", "no", "close", "clear", "reset", "logout"]
 
-                if any(kw in text_lower for kw in success_keywords):
-                    style_str = "success"
-                elif any(kw in text_lower for kw in danger_keywords):
-                    style_str = "danger"
-                else:
-                    style_str = "primary"
+            if any(kw in text_lower for kw in success_keywords):
+                style_str = "success"
+            elif any(kw in text_lower for kw in danger_keywords):
+                style_str = "danger"
+            else:
+                style_str = "primary"
 
         self.style = style_str
         self.icon_custom_emoji_id = icon_custom_emoji_id
@@ -113,9 +158,7 @@ class ColorInlineKeyboardButton(PyrogramInlineKeyboardButton):
 
 ColoredInlineKeyboardButton = ColorInlineKeyboardButton
 InlineKeyboardButton = ColorInlineKeyboardButton
-
-import pyrogram.types
-pyrogram.types.InlineKeyboardButton = ColorInlineKeyboardButton
+InlineKeyboardMarkup = PyrogramInlineKeyboardMarkup
 from config import *
 from pyrogram.errors.exceptions.bad_request_400 import UserNotParticipant
 from pyrogram.errors import FloodWait
@@ -1078,38 +1121,6 @@ def patched_on_message(self, filters=None, group=0):
 Client.on_message = patched_on_message
 
 
-# Patch telebot (pyTelegramBotAPI) to support direct string styles and icon_custom_emoji_id
-try:
-    import telebot
-    orig_telebot_button_init = telebot.types.InlineKeyboardButton.__init__
-    orig_telebot_button_to_dict = telebot.types.InlineKeyboardButton.to_dict
-
-    def patched_telebot_button_init(self, text, *args, style=None, icon_custom_emoji_id=None, **kwargs):
-        orig_telebot_button_init(self, text, *args, **kwargs)
-        if icon_custom_emoji_id is None:
-            icon_custom_emoji_id = DEFAULT_CUSTOM_EMOJI_ID
-
-        if isinstance(style, str) and style in ["primary", "success", "danger"]:
-            style_str = style
-        else:
-            style_str = "primary"
-
-        self.style = style_str
-        self.icon_custom_emoji_id = icon_custom_emoji_id
-
-    def patched_telebot_button_to_dict(self):
-        d = orig_telebot_button_to_dict(self)
-        if hasattr(self, 'style') and self.style:
-            d['style'] = self.style
-        if hasattr(self, 'icon_custom_emoji_id') and self.icon_custom_emoji_id is not None:
-            d['icon_custom_emoji_id'] = self.icon_custom_emoji_id
-        return d
-
-    telebot.types.InlineKeyboardButton.__init__ = patched_telebot_button_init
-    telebot.types.InlineKeyboardButton.to_dict = patched_telebot_button_to_dict
-    print("[PATCH] Patched telebot.types.InlineKeyboardButton successfully.")
-except ImportError:
-    pass
 
 # Upgrade all InlineKeyboardButton and InlineKeyboardMarkup classes in all Pyrogram libraries
 import sys
@@ -1122,8 +1133,8 @@ for pkg in ["pyrogram", "pyrofork", "wzgram"]:
             if hasattr(types_mod, "InlineKeyboardButton"):
                 setattr(types_mod, "InlineKeyboardButton", ColoredInlineKeyboardButton)
             if hasattr(types_mod, "InlineKeyboardMarkup"):
-                setattr(getattr(types_mod, "InlineKeyboardMarkup"), "__init__", patched_ikm_init)
-                setattr(getattr(types_mod, "InlineKeyboardMarkup"), "row", ikm_row)
+                setattr(getattr(types_mod, "InlineKeyboardMarkup"), "__init__", patched_pyrogram_ikm_init)
+                setattr(getattr(types_mod, "InlineKeyboardMarkup"), "row", pyrogram_ikm_row)
             print(f"[PATCH] Patched {pkg}.types successfully.")
     except Exception as e:
         pass

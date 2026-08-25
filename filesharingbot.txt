@@ -54,3 +54,4 @@
 [17-Jul-26 09:06:11 - INFO] - root - Database indexes created successfully.
 [17-Jul-26 09:07:22 - WARNING] - pyrogram.session.session - [Bot] Waiting for 2 seconds before continuing (required by "messages.ForwardMessages")
 [17-Jul-26 09:08:54 - WARNING] - pyrogram.session.session - [Bot] Waiting for 2 seconds before continuing (required by "messages.ForwardMessages")
+[25-Aug-26 10:59:23 - INFO] - ProxyManager - Loaded 0 proxies from database/config.
