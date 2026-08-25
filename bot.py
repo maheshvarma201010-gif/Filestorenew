@@ -275,9 +275,17 @@ class Bot(Client):
         self.LOGGER(__name__).info("Bot stopped.")
 
     def run(self):
-        """Run the bot."""
+        """Run the bot with global event loop safeguard."""
         print("[STARTUP] Entering loop.run_forever()...")
         loop = asyncio.get_event_loop()
+
+        def global_exception_handler(loop, context):
+            exception = context.get('exception')
+            msg = context.get('message')
+            print(f"[EVENT LOOP SAFEGUARD] Intercepted unhandled exception: {exception or msg}")
+
+        loop.set_exception_handler(global_exception_handler)
+
         loop.run_until_complete(self.start())
         self.LOGGER(__name__).info("Bot is now running. Thanks to @AniZoneFlix")
         print("[STARTUP] Bot is fully operational.")

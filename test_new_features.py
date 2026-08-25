@@ -17,7 +17,7 @@ from plugins.hyperlink import HYPERLINK_SESSIONS
 from core.telegram_parser import parse_telegram_link, normalize_telegram_url
 from core.range_parser import parse_range_token, parse_mixed_inputs
 from core.message_metadata import get_message_metadata, determine_filename, determine_caption
-from core.episode_detector import detect_episode, parse_season_episode_advanced, clean_episode_text
+from core.episode_detector import detect_episode, parse_season_episode_advanced, clean_episode_text, parse_metadata_universal
 from core.batch_generator import generate_final_link, generate_list_link
 from plugins.auto_batch import detect_quality
 
@@ -257,6 +257,26 @@ class TestCarousel(unittest.TestCase):
         media_video = get_input_media(msg_video, "Video Caption")
         self.assertIsNotNone(media_video)
         self.assertEqual(media_video.media, "video_id")
+
+class TestUniversalMetadataDetector(unittest.TestCase):
+    def test_parse_metadata_universal(self):
+        # Test Episode 01 / E01 / S01E01
+        s1, ep1, t1 = parse_metadata_universal("Naruto Shippuden Episode 01 1080p 2024")
+        self.assertEqual((s1, ep1, t1), (1, 1, 'episode'))
+
+        s2, ep2, t2 = parse_metadata_universal("Solo Leveling S02E12 720p x264")
+        self.assertEqual((s2, ep2, t2), (2, 12, 'episode'))
+
+        # Test Part 001 / Part01 / P001
+        s3, ep3, t3 = parse_metadata_universal("Anime Name Part001 480p")
+        self.assertEqual((s3, ep3, t3), (1, 1, 'part'))
+
+        s4, ep4, t4 = parse_metadata_universal("Anime Name Part 025 1080p")
+        self.assertEqual((s4, ep4, t4), (1, 25, 'part'))
+
+        # Test Season Only
+        s5, ep5, t5 = parse_metadata_universal("Anime Name Season 02 480p")
+        self.assertEqual((s5, ep5, t5), (2, None, 'season_only'))
 
 class TestIdDecoder(unittest.TestCase):
     def test_get_real_id_multiplied_and_raw(self):
