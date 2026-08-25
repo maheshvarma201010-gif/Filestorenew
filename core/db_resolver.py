@@ -40,20 +40,32 @@ async def resolve_channel_id(client, channel_ref):
 async def find_channel_owner(channel_id: int):
     """
     Checks the database to find which bot/clone owns this channel_id.
+    Handles raw ID, positive ID, and -100 prefixed channel IDs.
     Returns the bot's username (lowercase) or None.
     """
-    # 1. Check in channels collection
-    doc = await db.channel_data.find_one({"channel_id": channel_id})
-    if doc:
+    if not channel_id:
+        return None
+
+    abs_id = abs(int(channel_id))
+    candidates = [int(channel_id), abs_id, -abs_id]
+    if not str(abs_id).startswith("100"):
+        try:
+            candidates.append(int(f"-100{abs_id}"))
+        except:
+            pass
+
+    # 1. Check in channels collection (DB channels)
+    doc = await db.channel_data.find_one({"channel_id": {"$in": candidates}})
+    if doc and doc.get("bot_username"):
         return doc["bot_username"].lower()
 
     # 2. Check in clones collection
-    clone_doc = await db.clones.find_one({"channel_id": channel_id})
-    if clone_doc:
+    clone_doc = await db.clones.find_one({"channel_id": {"$in": candidates}})
+    if clone_doc and clone_doc.get("username"):
         return clone_doc["username"].lower()
 
     # 3. Check if it matches main bot's channel
-    if abs(channel_id) == abs(config.CHANNEL_ID):
+    if config.CHANNEL_ID and abs_id == abs(config.CHANNEL_ID):
         return config.BOT_USERNAME.lower()
 
     return None

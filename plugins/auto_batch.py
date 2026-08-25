@@ -465,7 +465,7 @@ async def run_auto_batch_scan(client, task):
                         files = files[:episode_limit]
 
                     mids = [f[2] for f in files]
-                    link = await generate_list_link(target_client, cid, mids)
+                    link = await generate_list_link(target_client, cid, mids, bot_username=target_bot_username)
 
                     first_num = files[0][0]
                     last_num = files[-1][0]

@@ -319,5 +319,22 @@ class TestIdDecoder(unittest.TestCase):
         self.assertEqual(get_real_id(0), (None, None))
         self.assertEqual(get_real_id(None), (None, None))
 
+class TestCrossBotLinkGeneration(unittest.TestCase):
+    def test_get_start_link_and_list_link_custom_bot_username(self):
+        import asyncio
+
+        class DummyClient:
+            username = "main_bot"
+
+        client = DummyClient()
+
+        # Test start link with explicit bot_username
+        link_clone = asyncio.run(generate_list_link(client, -100123456789, [10, 11, 12], bot_username="clone_bot"))
+        self.assertIn("https://t.me/clone_bot?start=", link_clone)
+
+        # Test start link fallback to client username
+        link_main = asyncio.run(generate_list_link(client, -100123456789, [10, 11, 12]))
+        self.assertIn("https://t.me/main_bot?start=", link_main)
+
 if __name__ == "__main__":
     unittest.main()
