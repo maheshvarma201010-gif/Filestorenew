@@ -9,7 +9,7 @@ from helper_func import admin
 from pyrogram import Client, filters, __version__
 from pyrogram.enums import ParseMode, ChatAction, ChatMemberStatus, ChatType
 from pyrogram.types import Message, InlineKeyboardMarkup, CallbackQuery, ReplyKeyboardMarkup, ChatMemberUpdated, ChatPermissions
-from helper_func import InlineKeyboardButton, random_button_style, ButtonStyle
+from helper_func import InlineKeyboardButton, random_button_style
 from pyrogram.errors.exceptions.bad_request_400 import UserNotParticipant, InviteHashEmpty, ChatAdminRequired, PeerIdInvalid, UserIsBlocked, InputUserDeactivated
 from config import *
 from helper_func import *
@@ -48,7 +48,7 @@ async def add_admins(client: Client, message: Message):
         except:
             report += f"❌ `{aid}`: Invalid ID.\n"
 
-    await pro.edit(f"📊 **ᴀᴅᴍɪɴ ᴀᴅᴅ ʀᴇᴘᴏʀᴛ:**\n\n{report}", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("ᴄʟᴏsᴇ", callback_data="close", style=ButtonStyle.DANGER)]]))
+    await pro.edit(f"📊 **ᴀᴅᴍɪɴ ᴀᴅᴅ ʀᴇᴘᴏʀᴛ:**\n\n{report}", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("ᴄʟᴏsᴇ", callback_data="close", style="danger")]]))
 
 @Client.on_message(filters.command('deladmin') & filters.private & admin)
 async def delete_admins(client: Client, message: Message):
@@ -84,7 +84,7 @@ async def delete_admins(client: Client, message: Message):
         except:
             report += f"❌ `{aid}`: Invalid ID.\n"
 
-    await pro.edit(f"📊 **ᴀᴅᴍɪɴ ʀᴇᴍᴏᴠᴀʟ ʀᴇᴘᴏʀᴛ:**\n\n{report}", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("ᴄʟᴏsᴇ", callback_data="close", style=ButtonStyle.DANGER)]]))
+    await pro.edit(f"📊 **ᴀᴅᴍɪɴ ʀᴇᴍᴏᴠᴀʟ ʀᴇᴘᴏʀᴛ:**\n\n{report}", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("ᴄʟᴏsᴇ", callback_data="close", style="danger")]]))
 
 
 @Client.on_message(filters.command('admins') & filters.private & admin)
@@ -97,7 +97,7 @@ async def get_admins(client: Client, message: Message):
     else:
         admin_list = "\n".join(f"<b><blockquote>ID: <code>{id}</code></blockquote></b>" for id in admin_ids)
 
-    reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("ᴄʟᴏsᴇ", callback_data="close", style=ButtonStyle.DANGER)]])
+    reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("ᴄʟᴏsᴇ", callback_data="close", style="danger")]])
     await pro.edit(f"<b>⚡ Current Admin List:</b>\n\n{admin_list}", reply_markup=reply_markup)
 
 @Client.on_message(filters.command('stats') & filters.private & admin)
@@ -274,10 +274,10 @@ async def fsub_bot_manager(client: Client, message: Message):
     else:
         for bot in bots:
             text += f"<b>• {bot['name']}</b> (@{bot['username']})\n<code>ID: {bot['_id']}</code>\n\n"
-            buttons.append([InlineKeyboardButton(f"🗑 Delete {bot['name']}", callback_data=f"dfbot_{bot['_id']}", style=ButtonStyle.DANGER)])
+            buttons.append([InlineKeyboardButton(f"🗑 Delete {bot['name']}", callback_data=f"dfbot_{bot['_id']}", style="danger")])
 
-    buttons.append([InlineKeyboardButton("➕ Add New Bot", callback_data="afbot", style=ButtonStyle.SUCCESS)])
-    buttons.append([InlineKeyboardButton("❌ Close", callback_data="close", style=ButtonStyle.DANGER)])
+    buttons.append([InlineKeyboardButton("➕ Add New Bot", callback_data="afbot", style="success")])
+    buttons.append([InlineKeyboardButton("❌ Close", callback_data="close", style="danger")])
 
     await message.reply_text(text, reply_markup=InlineKeyboardMarkup(buttons))
 
@@ -301,9 +301,9 @@ async def fsub_bot_callbacks(client: Client, query: CallbackQuery):
         else:
             for bot in bots:
                 text += f"<b>• {bot['name']}</b> (@{bot['username']})\n<code>ID: {bot['_id']}</code>\n\n"
-                buttons.append([InlineKeyboardButton(f"🗑 Delete {bot['name']}", callback_data=f"dfbot_{bot['_id']}", style=ButtonStyle.DANGER)])
-        buttons.append([InlineKeyboardButton("➕ Add New Bot", callback_data="afbot", style=ButtonStyle.SUCCESS)])
-        buttons.append([InlineKeyboardButton("❌ Close", callback_data="close", style=ButtonStyle.DANGER)])
+                buttons.append([InlineKeyboardButton(f"🗑 Delete {bot['name']}", callback_data=f"dfbot_{bot['_id']}", style="danger")])
+        buttons.append([InlineKeyboardButton("➕ Add New Bot", callback_data="afbot", style="success")])
+        buttons.append([InlineKeyboardButton("❌ Close", callback_data="close", style="danger")])
         await query.message.edit_text(text, reply_markup=InlineKeyboardMarkup(buttons))
 
     elif data == "afbot":
@@ -400,7 +400,7 @@ async def reset_verification(client: Client, message: Message):
                 f"✅ Sessions Cleared : {total_sessions + total_users}\n"
                 "✅ Status : Success"
             )
-            return await pro.edit(report, reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("❌ Close", callback_data="close", style=ButtonStyle.DANGER)]]))
+            return await pro.edit(report, reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("❌ Close", callback_data="close", style="danger")]]))
         except Exception as e:
             return await pro.edit(f"❌ **Reset Error:** `{e}`")
 
@@ -439,7 +439,7 @@ async def reset_verification(client: Client, message: Message):
         except Exception as e:
             report += f"❌ `{uid}`: {e}\n"
 
-    await pro.edit(f"📊 **ʀᴇsᴇᴛ ʀᴇᴘᴏʀᴛ:**\n\n{report}", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("❌ Close", callback_data="close", style=ButtonStyle.DANGER)]]))
+    await pro.edit(f"📊 **ʀᴇsᴇᴛ ʀᴇᴘᴏʀᴛ:**\n\n{report}", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("❌ Close", callback_data="close", style="danger")]]))
 
 @Client.on_message(filters.command('redirect') & filters.private & admin)
 async def check_redirects_cmd(client: Client, message: Message):
@@ -503,7 +503,7 @@ async def check_redirects_cmd(client: Client, message: Message):
                 report = ""
 
     if report:
-        await pro.edit(report, disable_web_page_preview=True, reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("❌ Cʟᴏsᴇ", callback_data="close", style=ButtonStyle.DANGER)]]))
+        await pro.edit(report, disable_web_page_preview=True, reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("❌ Cʟᴏsᴇ", callback_data="close", style="danger")]]))
     else:
         await pro.delete()
 
@@ -536,10 +536,10 @@ async def save_command(client: Client, message: Message):
 
     buttons = [
         [
-            InlineKeyboardButton("Backup", callback_data="system_backup", style=ButtonStyle.SUCCESS),
-            InlineKeyboardButton("Restore", callback_data="system_restore", style=ButtonStyle.SUCCESS)
+            InlineKeyboardButton("Backup", callback_data="system_backup", style="success"),
+            InlineKeyboardButton("Restore", callback_data="system_restore", style="success")
         ],
-        [InlineKeyboardButton("Close", callback_data="close", style=ButtonStyle.DANGER)]
+        [InlineKeyboardButton("Close", callback_data="close", style="danger")]
     ]
     await message.reply_text(
         "🛠️ **System Maintenance**\n\n"
@@ -616,10 +616,10 @@ async def db_channel_manager(client: Client, message: Message):
                 text += f"<b>• {chat.title}</b>\n<code>ID: {cid}</code>\n\n"
             except:
                 text += f"<b>• Unknown Channel</b>\n<code>ID: {cid}</code>\n\n"
-            buttons.append([InlineKeyboardButton(f"🗑 Delete {cid}", callback_data=f"ddbch_{cid}", style=ButtonStyle.DANGER)])
+            buttons.append([InlineKeyboardButton(f"🗑 Delete {cid}", callback_data=f"ddbch_{cid}", style="danger")])
 
-    buttons.append([InlineKeyboardButton("➕ Add DB Channel", callback_data="adbch", style=ButtonStyle.SUCCESS)])
-    buttons.append([InlineKeyboardButton("❌ Close", callback_data="close", style=ButtonStyle.DANGER)])
+    buttons.append([InlineKeyboardButton("➕ Add DB Channel", callback_data="adbch", style="success")])
+    buttons.append([InlineKeyboardButton("❌ Close", callback_data="close", style="danger")])
 
     await message.reply_text(text, reply_markup=InlineKeyboardMarkup(buttons))
 
@@ -741,9 +741,9 @@ async def db_channel_callbacks(client: Client, query: CallbackQuery):
                     text += f"<b>• {chat.title}</b>\n<code>ID: {chid}</code>\n\n"
                 except:
                     text += f"<b>• Unknown Channel</b>\n<code>ID: {chid}</code>\n\n"
-                buttons.append([InlineKeyboardButton(f"🗑 Delete {chid}", callback_data=f"ddbch_{chid}", style=ButtonStyle.DANGER)])
-        buttons.append([InlineKeyboardButton("➕ Add DB Channel", callback_data="adbch", style=ButtonStyle.SUCCESS)])
-        buttons.append([InlineKeyboardButton("❌ Close", callback_data="close", style=ButtonStyle.DANGER)])
+                buttons.append([InlineKeyboardButton(f"🗑 Delete {chid}", callback_data=f"ddbch_{chid}", style="danger")])
+        buttons.append([InlineKeyboardButton("➕ Add DB Channel", callback_data="adbch", style="success")])
+        buttons.append([InlineKeyboardButton("❌ Close", callback_data="close", style="danger")])
         await query.message.edit_text(text, reply_markup=InlineKeyboardMarkup(buttons))
 
     elif data == "adbch":

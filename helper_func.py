@@ -20,29 +20,15 @@ except ImportError:
     from pyrofork.enums import ChatMemberStatus
     from pyrofork.types import Message, InlineKeyboardMarkup, InlineKeyboardButton as PyrogramInlineKeyboardButton
 
-HAS_BUTTON_STYLE = False
-PyrogramButtonStyle = None
-
-try:
-    try:
-        from pyrogram.enums.button_style import ButtonStyle as PyrogramButtonStyle
-    except ImportError:
-        try:
-            from pyrogram.enums import ButtonStyle as PyrogramButtonStyle
-        except ImportError:
-            from pyrofork.enums import ButtonStyle as PyrogramButtonStyle
-    if PyrogramButtonStyle is not None:
-        HAS_BUTTON_STYLE = True
-except ImportError:
-    pass
+DEFAULT_CUSTOM_EMOJI_ID = 5440389890787281213
 
 class ButtonStyle:
-    PRIMARY = getattr(PyrogramButtonStyle, "PRIMARY", "primary") if PyrogramButtonStyle else "primary"
-    SUCCESS = getattr(PyrogramButtonStyle, "SUCCESS", "success") if PyrogramButtonStyle else "success"
-    DANGER = getattr(PyrogramButtonStyle, "DANGER", "danger") if PyrogramButtonStyle else "danger"
-    DEFAULT = getattr(PyrogramButtonStyle, "DEFAULT", "default") if PyrogramButtonStyle else "default"
-    SECONDARY = PRIMARY
-    WARNING = SUCCESS
+    PRIMARY = "primary"
+    SUCCESS = "success"
+    DANGER = "danger"
+    DEFAULT = "primary"
+    SECONDARY = "primary"
+    WARNING = "success"
 
 SUPPORTED_STYLES = [
     ButtonStyle.PRIMARY,
@@ -53,63 +39,75 @@ SUPPORTED_STYLES = [
 def random_button_style():
     return random.choice(SUPPORTED_STYLES)
 
+orig_ikm_init = InlineKeyboardMarkup.__init__
+
+def patched_ikm_init(self, inline_keyboard=None, *args, **kwargs):
+    if inline_keyboard is None:
+        inline_keyboard = []
+    orig_ikm_init(self, inline_keyboard, *args, **kwargs)
+
+def ikm_row(self, *buttons):
+    if not hasattr(self, "inline_keyboard") or self.inline_keyboard is None:
+        self.inline_keyboard = []
+    self.inline_keyboard.append(list(buttons))
+    return self
+
+InlineKeyboardMarkup.__init__ = patched_ikm_init
+InlineKeyboardMarkup.row = ikm_row
+
 class ColorInlineKeyboardButton(PyrogramInlineKeyboardButton):
     def __init__(self, text: str, *args, **kwargs):
         style = kwargs.pop("style", None)
         icon_custom_emoji_id = kwargs.pop("icon_custom_emoji_id", None)
 
-        # Map new style names if explicitly passed
-        if style in ["bg_success", "bg_danger", "bg_primary"]:
-            if style == "bg_success":
-                style_enum = ButtonStyle.SUCCESS
-            elif style == "bg_danger":
-                style_enum = ButtonStyle.DANGER
-            else:
-                style_enum = ButtonStyle.PRIMARY
-        elif isinstance(style, ButtonStyle):
-            style_enum = style
+        if icon_custom_emoji_id is None:
+            icon_custom_emoji_id = DEFAULT_CUSTOM_EMOJI_ID
+
+        # Direct string styles: "primary", "success", "danger"
+        if isinstance(style, str) and style in ["primary", "success", "danger"]:
+            style_str = style
+        elif style in ["bg_success", "success"]:
+            style_str = "success"
+        elif style in ["bg_danger", "danger"]:
+            style_str = "danger"
+        elif style in ["bg_primary", "primary", "secondary", "default"]:
+            style_str = "primary"
         else:
-            # Try to resolve other formats
-            style_str = str(style).upper() if style else ""
-            if hasattr(ButtonStyle, style_str):
-                style_enum = getattr(ButtonStyle, style_str)
+            style_str_raw = str(style).lower() if style else ""
+            if style_str_raw in ["primary", "success", "danger"]:
+                style_str = style_str_raw
             else:
-                # Automatic Color Assignment based on button text
                 text_lower = str(text).lower()
-                success_keywords = ["download", "get", "generate", "start", "continue", "confirm", "watch", "active", "verify", "yes"]
-                danger_keywords = ["delete", "remove", "cancel", "stop", "ban", "no", "close", "clear", "reset"]
+                success_keywords = ["download", "get", "generate", "start", "continue", "confirm", "watch", "active", "verify", "yes", "login"]
+                danger_keywords = ["delete", "remove", "cancel", "stop", "ban", "no", "close", "clear", "reset", "logout"]
 
                 if any(kw in text_lower for kw in success_keywords):
-                    style_enum = ButtonStyle.SUCCESS
+                    style_str = "success"
                 elif any(kw in text_lower for kw in danger_keywords):
-                    style_enum = ButtonStyle.DANGER
+                    style_str = "danger"
                 else:
-                    style_enum = ButtonStyle.PRIMARY
+                    style_str = "primary"
 
-        self.style = style_enum
-        if icon_custom_emoji_id is not None:
-            self.icon_custom_emoji_id = icon_custom_emoji_id
+        self.style = style_str
+        self.icon_custom_emoji_id = icon_custom_emoji_id
 
-        extra_kwargs = {}
-        if style_enum is not None:
-            extra_kwargs["style"] = style_enum
-        if icon_custom_emoji_id is not None:
-            extra_kwargs["icon_custom_emoji_id"] = icon_custom_emoji_id
+        extra_kwargs = {
+            "style": style_str,
+            "icon_custom_emoji_id": icon_custom_emoji_id
+        }
 
-        if extra_kwargs:
-            try:
-                super().__init__(text, *args, **extra_kwargs, **kwargs)
-                return
-            except TypeError:
-                # Fallback if pyrogram/pyrofork version doesn't accept style/icon_custom_emoji_id in __init__
-                if "icon_custom_emoji_id" in extra_kwargs:
-                    extra_kwargs.pop("icon_custom_emoji_id")
-                if "style" in extra_kwargs:
-                    try:
-                        super().__init__(text, *args, style=extra_kwargs["style"], **kwargs)
-                        return
-                    except TypeError:
-                        pass
+        try:
+            super().__init__(text, *args, **extra_kwargs, **kwargs)
+            return
+        except TypeError:
+            if "icon_custom_emoji_id" in extra_kwargs:
+                extra_kwargs.pop("icon_custom_emoji_id")
+            if "style" in extra_kwargs:
+                try:
+                    super().__init__(text, *args, style=extra_kwargs["style"], **kwargs)
+                    return
+                except TypeError:
+                    pass
 
         super().__init__(text, *args, **kwargs)
 
@@ -1080,16 +1078,20 @@ def patched_on_message(self, filters=None, group=0):
 Client.on_message = patched_on_message
 
 
-# Upgrade all InlineKeyboardButton classes to ColoredInlineKeyboardButton in all Pyrogram libraries
+# Upgrade all InlineKeyboardButton and InlineKeyboardMarkup classes in all Pyrogram libraries
 import sys
 for pkg in ["pyrogram", "pyrofork", "wzgram"]:
     try:
         types_mod = sys.modules.get(f"{pkg}.types")
         if not types_mod:
-            types_mod = __import__(f"{pkg}.types", fromlist=["InlineKeyboardButton"])
+            types_mod = __import__(f"{pkg}.types", fromlist=["InlineKeyboardButton", "InlineKeyboardMarkup"])
         if types_mod:
-            setattr(types_mod, "InlineKeyboardButton", ColoredInlineKeyboardButton)
-            print(f"[PATCH] Patched {pkg}.types.InlineKeyboardButton successfully.")
+            if hasattr(types_mod, "InlineKeyboardButton"):
+                setattr(types_mod, "InlineKeyboardButton", ColoredInlineKeyboardButton)
+            if hasattr(types_mod, "InlineKeyboardMarkup"):
+                setattr(getattr(types_mod, "InlineKeyboardMarkup"), "__init__", patched_ikm_init)
+                setattr(getattr(types_mod, "InlineKeyboardMarkup"), "row", ikm_row)
+            print(f"[PATCH] Patched {pkg}.types successfully.")
     except Exception as e:
         pass
 

@@ -1,7 +1,7 @@
 
 from pyrogram import Client, filters
 from pyrogram.types import Message, InlineKeyboardMarkup, CallbackQuery
-from helper_func import InlineKeyboardButton, random_button_style, ButtonStyle
+from helper_func import InlineKeyboardButton, random_button_style
 from config import OWNER_ID, ANIME_BANNERS
 from database.database import db
 from helper_func import admin, get_banners, send_media
@@ -66,58 +66,58 @@ def get_panel_markup(settings):
 
     buttons = [
         [
-            InlineKeyboardButton(f"🚀 sʏs: {get_ico('shortener_active')}", callback_data="tg_shortener_active", style=ButtonStyle.SUCCESS),
-            InlineKeyboardButton(f"🌐 ꜰ-ɢᴀᴛᴇ: {get_ico('frontend_verify')}", callback_data="tg_frontend_verify", style=ButtonStyle.SUCCESS)
+            InlineKeyboardButton(f"🚀 sʏs: {get_ico('shortener_active')}", callback_data="tg_shortener_active", style="success"),
+            InlineKeyboardButton(f"🌐 ꜰ-ɢᴀᴛᴇ: {get_ico('frontend_verify')}", callback_data="tg_frontend_verify", style="success")
         ],
         [
-            InlineKeyboardButton(f"🛡️ ʀᴇᴄᴀᴘ: {get_ico('use_recaptcha', False)}", callback_data="set_captcha_recaptcha", style=ButtonStyle.SUCCESS),
-            InlineKeyboardButton(f"🛡️ ᴛᴜʀɴ: {get_ico('use_turnstile', False)}", callback_data="set_captcha_turnstile", style=ButtonStyle.SUCCESS)
+            InlineKeyboardButton(f"🛡️ ʀᴇᴄᴀᴘ: {get_ico('use_recaptcha', False)}", callback_data="set_captcha_recaptcha", style="success"),
+            InlineKeyboardButton(f"🛡️ ᴛᴜʀɴ: {get_ico('use_turnstile', False)}", callback_data="set_captcha_turnstile", style="success")
         ],
         [
-             InlineKeyboardButton(f"🎲 ʀᴀɴᴅᴏᴍ: {get_ico('random_mode', False)}", callback_data="tg_random_mode", style=ButtonStyle.SUCCESS),
-             InlineKeyboardButton("🔌 ᴀᴘɪ ᴜʀʟ", callback_data="edit_auth_api_url", style=ButtonStyle.PRIMARY)
+             InlineKeyboardButton(f"🎲 ʀᴀɴᴅᴏᴍ: {get_ico('random_mode', False)}", callback_data="tg_random_mode", style="success"),
+             InlineKeyboardButton("🔌 ᴀᴘɪ ᴜʀʟ", callback_data="edit_auth_api_url", style="primary")
         ],
         [
-             InlineKeyboardButton(f"🤝 ʀᴇꜰ: {get_ico('referral_active', True)}", callback_data="tg_referral_active", style=ButtonStyle.SUCCESS),
-             InlineKeyboardButton("🔄 sʏɴᴄ", callback_data="refresh_panel", style=ButtonStyle.PRIMARY)
+             InlineKeyboardButton(f"🤝 ʀᴇꜰ: {get_ico('referral_active', True)}", callback_data="tg_referral_active", style="success"),
+             InlineKeyboardButton("🔄 sʏɴᴄ", callback_data="refresh_panel", style="primary")
         ],
         [
-            InlineKeyboardButton("🆔 ᴀᴘᴘ ɪᴅ", callback_data="edit_auth_app_id", style=ButtonStyle.PRIMARY),
-            InlineKeyboardButton("🔑 ᴀᴘɪ ʜᴀsʜ", callback_data="edit_auth_api_hash", style=ButtonStyle.PRIMARY)
+            InlineKeyboardButton("🆔 ᴀᴘᴘ ɪᴅ", callback_data="edit_auth_app_id", style="primary"),
+            InlineKeyboardButton("🔑 ᴀᴘɪ ʜᴀsʜ", callback_data="edit_auth_api_hash", style="primary")
         ],
         [
-            InlineKeyboardButton("👑 ᴏᴡɴᴇʀ ɪᴅ", callback_data="edit_auth_owner_id", style=ButtonStyle.PRIMARY),
-            InlineKeyboardButton("🔑 ᴄᴏʀᴇ ᴄᴏɴꜰɪɢ", callback_data="show_auth", style=ButtonStyle.SECONDARY)
+            InlineKeyboardButton("👑 ᴏᴡɴᴇʀ ɪᴅ", callback_data="edit_auth_owner_id", style="primary"),
+            InlineKeyboardButton("🔑 ᴄᴏʀᴇ ᴄᴏɴꜰɪɢ", callback_data="show_auth", style="primary")
         ],
         [
-            InlineKeyboardButton("📊 sᴛᴀᴛɪsᴛɪᴄs", callback_data="view_stats", style=ButtonStyle.SECONDARY),
-            InlineKeyboardButton("🎬 ᴠɪᴅᴇᴏ ᴄᴏɴꜰɪɢ", callback_data="manage_videos", style=ButtonStyle.SECONDARY)
+            InlineKeyboardButton("📊 sᴛᴀᴛɪsᴛɪᴄs", callback_data="view_stats", style="primary"),
+            InlineKeyboardButton("🎬 ᴠɪᴅᴇᴏ ᴄᴏɴꜰɪɢ", callback_data="manage_videos", style="primary")
         ],
         [
-            InlineKeyboardButton("🔗 sʜᴏʀᴛ ᴄᴏɴꜰɪɢ", callback_data="manage_shorteners", style=ButtonStyle.SECONDARY),
-            InlineKeyboardButton("🤖 ᴄʟᴏɴᴇ ᴍᴀɴᴀɢᴇʀ", callback_data="manage_clones", style=ButtonStyle.SECONDARY)
+            InlineKeyboardButton("🔗 sʜᴏʀᴛ ᴄᴏɴꜰɪɢ", callback_data="manage_shorteners", style="primary"),
+            InlineKeyboardButton("🤖 ᴄʟᴏɴᴇ ᴍᴀɴᴀɢᴇʀ", callback_data="manage_clones", style="primary")
         ],
         [
-            InlineKeyboardButton("📝 ᴄᴜsᴛᴏᴍ ᴄᴀᴘᴛɪᴏɴ", callback_data="manage_custom_caption", style=ButtonStyle.SECONDARY),
-            InlineKeyboardButton("🖼️ ɪᴍᴀɢᴇ ᴄᴏɴꜰɪɢ", callback_data="manage_images", style=ButtonStyle.SECONDARY)
+            InlineKeyboardButton("📝 ᴄᴜsᴛᴏᴍ ᴄᴀᴘᴛɪᴏɴ", callback_data="manage_custom_caption", style="primary"),
+            InlineKeyboardButton("🖼️ ɪᴍᴀɢᴇ ᴄᴏɴꜰɪɢ", callback_data="manage_images", style="primary")
         ],
         [
-            InlineKeyboardButton("🤖 ʀᴇǫ ʙᴏᴛs", callback_data="view_fsub_bots", style=ButtonStyle.SECONDARY),
-            InlineKeyboardButton("🤖 ʜᴇʟᴘᴇʀ ʙᴏᴛs", callback_data="manage_helpers", style=ButtonStyle.SECONDARY)
+            InlineKeyboardButton("🤖 ʀᴇǫ ʙᴏᴛs", callback_data="view_fsub_bots", style="primary"),
+            InlineKeyboardButton("🤖 ʜᴇʟᴘᴇʀ ʙᴏᴛs", callback_data="manage_helpers", style="primary")
         ],
         [
-            InlineKeyboardButton("🌐 ᴘʀᴏxɪᴇs", callback_data="manage_proxies", style=ButtonStyle.SECONDARY),
-            InlineKeyboardButton("📝 ᴠᴇʀɪғʏ ʟᴏɢ", callback_data="manage_verify_log", style=ButtonStyle.SECONDARY)
+            InlineKeyboardButton("🌐 ᴘʀᴏxɪᴇs", callback_data="manage_proxies", style="primary"),
+            InlineKeyboardButton("📝 ᴠᴇʀɪғʏ ʟᴏɢ", callback_data="manage_verify_log", style="primary")
         ],
         [
-            InlineKeyboardButton("🛡️ ᴠᴇʀɪғɪᴄᴀᴛɪᴏɴ sᴇᴛᴛɪɴɢs", callback_data="manage_verification", style=ButtonStyle.SECONDARY)
+            InlineKeyboardButton("🛡️ ᴠᴇʀɪғɪᴄᴀᴛɪᴏɴ sᴇᴛᴛɪɴɢs", callback_data="manage_verification", style="primary")
         ],
         [
-            InlineKeyboardButton("🔄 ʀᴇsᴛᴀʀᴛ", callback_data="panel_restart", style=ButtonStyle.DANGER)
+            InlineKeyboardButton("🔄 ʀᴇsᴛᴀʀᴛ", callback_data="panel_restart", style="danger")
         ],
         [
-            InlineKeyboardButton("🔄 sʏɴᴄ", callback_data="refresh_panel", style=ButtonStyle.PRIMARY),
-            InlineKeyboardButton("❌ ᴄʟᴏsᴇ", callback_data="close", style=ButtonStyle.DANGER)
+            InlineKeyboardButton("🔄 sʏɴᴄ", callback_data="refresh_panel", style="primary"),
+            InlineKeyboardButton("❌ ᴄʟᴏsᴇ", callback_data="close", style="danger")
         ]
     ]
     return InlineKeyboardMarkup(buttons)
@@ -196,7 +196,7 @@ async def panel_callback(client: Client, query: CallbackQuery):
             details = (log['details'][:60] + '...') if len(log['details']) > 60 else log['details']
             log_text += f"• [{dt}] **{log['event_type']}**: `{details}`\n"
 
-        markup = InlineKeyboardMarkup([[InlineKeyboardButton("🔙 ʙᴀᴄᴋ", callback_data="refresh_panel", style=ButtonStyle.SECONDARY)]])
+        markup = InlineKeyboardMarkup([[InlineKeyboardButton("🔙 ʙᴀᴄᴋ", callback_data="refresh_panel", style="primary")]])
         return await edit_panel_message(query, log_text, markup)
     elif data == "view_fsub_bots":
         bots = await db.get_fsub_bots()
@@ -208,7 +208,7 @@ async def panel_callback(client: Client, query: CallbackQuery):
                 text += f"• `{bot['_id']}` : `{bot['token'][:10]}...`\n"
 
         text += "\nUse `/fsubbot` command to manage these bots."
-        markup = InlineKeyboardMarkup([[InlineKeyboardButton("🔙 ʙᴀᴄᴋ", callback_data="refresh_panel", style=ButtonStyle.SECONDARY)]])
+        markup = InlineKeyboardMarkup([[InlineKeyboardButton("🔙 ʙᴀᴄᴋ", callback_data="refresh_panel", style="primary")]])
         return await edit_panel_message(query, text, markup)
     elif data == "panel_restart":
         await query.answer("Restarting Bot...", show_alert=True)
@@ -227,12 +227,12 @@ async def panel_callback(client: Client, query: CallbackQuery):
                 uname = clone['username']
                 text += f"• @{uname} (ID: `{clone['channel_id']}`)\n"
                 buttons.append([
-                    InlineKeyboardButton(f"⚙️ Configure @{uname}", callback_data=f"conf_clone_{uname}", style=ButtonStyle.SECONDARY),
-                    InlineKeyboardButton(f"🗑 ᴅᴇʟᴇᴛᴇ", callback_data=f"del_clone_{uname}", style=ButtonStyle.DANGER)
+                    InlineKeyboardButton(f"⚙️ Configure @{uname}", callback_data=f"conf_clone_{uname}", style="primary"),
+                    InlineKeyboardButton(f"🗑 ᴅᴇʟᴇᴛᴇ", callback_data=f"del_clone_{uname}", style="danger")
                 ])
 
-        buttons.append([InlineKeyboardButton("➕ ᴀᴅᴅ ɴᴇᴡ ᴄʟᴏɴᴇ", callback_data="add_clone", style=ButtonStyle.SUCCESS)])
-        buttons.append([InlineKeyboardButton("🔙 ʙᴀᴄᴋ", callback_data="refresh_panel", style=ButtonStyle.SECONDARY)])
+        buttons.append([InlineKeyboardButton("➕ ᴀᴅᴅ ɴᴇᴡ ᴄʟᴏɴᴇ", callback_data="add_clone", style="success")])
+        buttons.append([InlineKeyboardButton("🔙 ʙᴀᴄᴋ", callback_data="refresh_panel", style="primary")])
         return await edit_panel_message(query, text, InlineKeyboardMarkup(buttons))
 
     elif data.startswith("conf_clone_"):
@@ -250,9 +250,9 @@ async def panel_callback(client: Client, query: CallbackQuery):
             "━━━━━━━━━━━━━━━━━━━"
         )
         buttons = [
-            [InlineKeyboardButton("📝 ᴇᴅɪᴛ ɴᴀᴍᴇ", callback_data=f"cset_name_{uname}", style=ButtonStyle.PRIMARY), InlineKeyboardButton("🔗 ᴄᴏᴍᴍᴜɴɪᴛʏ ʟɪɴᴋ", callback_data=f"cset_community_link_{uname}", style=ButtonStyle.PRIMARY)],
-            [InlineKeyboardButton("📢 ꜰsᴜʙ ᴄʜᴀɴɴᴇʟs", callback_data=f"cset_fsub_channels_{uname}", style=ButtonStyle.PRIMARY), InlineKeyboardButton("🔑 ᴛᴏᴋᴇɴ", callback_data=f"edit_clone_{uname}", style=ButtonStyle.PRIMARY)],
-            [InlineKeyboardButton("🔙 ʙᴀᴄᴋ", callback_data="manage_clones", style=ButtonStyle.SECONDARY)]
+            [InlineKeyboardButton("📝 ᴇᴅɪᴛ ɴᴀᴍᴇ", callback_data=f"cset_name_{uname}", style="primary"), InlineKeyboardButton("🔗 ᴄᴏᴍᴍᴜɴɪᴛʏ ʟɪɴᴋ", callback_data=f"cset_community_link_{uname}", style="primary")],
+            [InlineKeyboardButton("📢 ꜰsᴜʙ ᴄʜᴀɴɴᴇʟs", callback_data=f"cset_fsub_channels_{uname}", style="primary"), InlineKeyboardButton("🔑 ᴛᴏᴋᴇɴ", callback_data=f"edit_clone_{uname}", style="primary")],
+            [InlineKeyboardButton("🔙 ʙᴀᴄᴋ", callback_data="manage_clones", style="primary")]
         ]
         return await edit_panel_message(query, text, InlineKeyboardMarkup(buttons))
 
@@ -306,10 +306,10 @@ async def panel_callback(client: Client, query: CallbackQuery):
         buttons = []
         for i, url in enumerate(banners):
             text += f"• `{i+1}`: {url[:30]}...\n"
-            buttons.append([InlineKeyboardButton(f"🗑 Delete #{i+1}", callback_data=f"cdel_banner_{uname}_{i}", style=ButtonStyle.DANGER)])
+            buttons.append([InlineKeyboardButton(f"🗑 Delete #{i+1}", callback_data=f"cdel_banner_{uname}_{i}", style="danger")])
 
-        buttons.append([InlineKeyboardButton("➕ ᴀᴅᴅ ʙᴀɴɴᴇʀ", callback_data=f"cbanner_add_{uname}", style=ButtonStyle.SUCCESS)])
-        buttons.append([InlineKeyboardButton("🔙 ʙᴀᴄᴋ", callback_data=f"conf_clone_{uname}", style=ButtonStyle.SECONDARY)])
+        buttons.append([InlineKeyboardButton("➕ ᴀᴅᴅ ʙᴀɴɴᴇʀ", callback_data=f"cbanner_add_{uname}", style="success")])
+        buttons.append([InlineKeyboardButton("🔙 ʙᴀᴄᴋ", callback_data=f"conf_clone_{uname}", style="primary")])
         return await edit_panel_message(query, text, InlineKeyboardMarkup(buttons))
 
     elif data.startswith("cbanner_add_"):
@@ -494,7 +494,7 @@ async def panel_callback(client: Client, query: CallbackQuery):
             f"🚫 <b>Bypasses Blocked:</b> <code>{stats.get('total_bypasses', 0)}</code>\n"
             "━━━━━━━━━━━━━━━━━━━"
         )
-        markup = InlineKeyboardMarkup([[InlineKeyboardButton("🔙 ʙᴀᴄᴋ", callback_data="refresh_panel", style=ButtonStyle.SECONDARY)]])
+        markup = InlineKeyboardMarkup([[InlineKeyboardButton("🔙 ʙᴀᴄᴋ", callback_data="refresh_panel", style="primary")]])
         return await edit_panel_message(query, text, markup)
     elif data == "show_auth":
         settings = await db.get_settings(bot_username=client.username)
@@ -511,19 +511,19 @@ async def panel_callback(client: Client, query: CallbackQuery):
             "━━━━━━━━━━━━━━━━━━━\n"
             "<i>ᴛᴀᴘ ᴀ ʙᴜᴛᴛᴏɴ ʙᴇʟᴏᴡ ᴛᴏ ᴜᴘᴅᴀᴛᴇ sᴇᴛᴛɪɴɢs. ✨</i>"
         )
-        session_row = [InlineKeyboardButton("🔑 sᴇssɪᴏɴ sᴛʀɪɴɢ", callback_data="edit_auth_session_string", style=ButtonStyle.PRIMARY)]
+        session_row = [InlineKeyboardButton("🔑 sᴇssɪᴏɴ sᴛʀɪɴɢ", callback_data="edit_auth_session_string", style="primary")]
         if settings.get('session_string'):
-            session_row.append(InlineKeyboardButton("🗑 ᴅᴇʟᴇᴛᴇ sᴇssɪᴏɴ", callback_data="delete_session_string", style=ButtonStyle.DANGER))
+            session_row.append(InlineKeyboardButton("🗑 ᴅᴇʟᴇᴛᴇ sᴇssɪᴏɴ", callback_data="delete_session_string", style="danger"))
 
         buttons = [
-            [InlineKeyboardButton("🌐 ᴡᴇʙ ᴜʀʟ", callback_data="edit_auth_website_url", style=ButtonStyle.PRIMARY), InlineKeyboardButton("🔌 ᴀᴘɪ ᴜʀʟ", callback_data="edit_auth_api_url", style=ButtonStyle.PRIMARY)],
-            [InlineKeyboardButton("🌐 ʙᴀsᴇ ᴜʀʟ", callback_data="edit_auth_base_url", style=ButtonStyle.PRIMARY), InlineKeyboardButton("🕒 ᴠɪɴᴅᴏᴡ", callback_data="edit_auth_verify_window", style=ButtonStyle.PRIMARY)],
-            [InlineKeyboardButton("🔢 ᴀᴄᴄᴇss-ʟɪᴍɪᴛ", callback_data="edit_auth_access_limit", style=ButtonStyle.PRIMARY), InlineKeyboardButton("🤖 ʙᴏᴛ ɴᴀᴍᴇ", callback_data="edit_auth_bot_name", style=ButtonStyle.PRIMARY)],
-            [InlineKeyboardButton("🤖 ʙᴏᴛ ᴜsᴇʀɴᴀᴍᴇ", callback_data="edit_auth_bot_username", style=ButtonStyle.PRIMARY), InlineKeyboardButton("🔒 ᴘʀᴏᴛᴇᴄᴛ ᴄᴏɴᴛᴇɴᴛ", callback_data="show_shield_settings", style=ButtonStyle.SECONDARY)],
-            [InlineKeyboardButton("👤 ᴏᴡɴᴇʀ ᴛᴀɢ", callback_data="edit_auth_owner_tag", style=ButtonStyle.PRIMARY), InlineKeyboardButton("💸 ᴜᴘɪ ɪᴅ", callback_data="edit_auth_upi_id", style=ButtonStyle.PRIMARY)],
-            [InlineKeyboardButton("📦 ᴄᴅɴ ᴜʀʟ", callback_data="edit_auth_cdn_url", style=ButtonStyle.PRIMARY), InlineKeyboardButton("🛡️ ᴄᴀᴘᴛᴄʜᴀ ᴋᴇʏs", callback_data="show_captcha_keys", style=ButtonStyle.SECONDARY)],
+            [InlineKeyboardButton("🌐 ᴡᴇʙ ᴜʀʟ", callback_data="edit_auth_website_url", style="primary"), InlineKeyboardButton("🔌 ᴀᴘɪ ᴜʀʟ", callback_data="edit_auth_api_url", style="primary")],
+            [InlineKeyboardButton("🌐 ʙᴀsᴇ ᴜʀʟ", callback_data="edit_auth_base_url", style="primary"), InlineKeyboardButton("🕒 ᴠɪɴᴅᴏᴡ", callback_data="edit_auth_verify_window", style="primary")],
+            [InlineKeyboardButton("🔢 ᴀᴄᴄᴇss-ʟɪᴍɪᴛ", callback_data="edit_auth_access_limit", style="primary"), InlineKeyboardButton("🤖 ʙᴏᴛ ɴᴀᴍᴇ", callback_data="edit_auth_bot_name", style="primary")],
+            [InlineKeyboardButton("🤖 ʙᴏᴛ ᴜsᴇʀɴᴀᴍᴇ", callback_data="edit_auth_bot_username", style="primary"), InlineKeyboardButton("🔒 ᴘʀᴏᴛᴇᴄᴛ ᴄᴏɴᴛᴇɴᴛ", callback_data="show_shield_settings", style="primary")],
+            [InlineKeyboardButton("👤 ᴏᴡɴᴇʀ ᴛᴀɢ", callback_data="edit_auth_owner_tag", style="primary"), InlineKeyboardButton("💸 ᴜᴘɪ ɪᴅ", callback_data="edit_auth_upi_id", style="primary")],
+            [InlineKeyboardButton("📦 ᴄᴅɴ ᴜʀʟ", callback_data="edit_auth_cdn_url", style="primary"), InlineKeyboardButton("🛡️ ᴄᴀᴘᴛᴄʜᴀ ᴋᴇʏs", callback_data="show_captcha_keys", style="primary")],
             [*session_row],
-            [InlineKeyboardButton("🔙 ʙᴀᴄᴋ", callback_data="refresh_panel", style=ButtonStyle.SECONDARY)]
+            [InlineKeyboardButton("🔙 ʙᴀᴄᴋ", callback_data="refresh_panel", style="primary")]
         ]
         return await edit_panel_message(query, auth_text, InlineKeyboardMarkup(buttons))
 
@@ -538,9 +538,9 @@ async def panel_callback(client: Client, query: CallbackQuery):
             f"🔐 <b>ᴛ-sᴇᴄʀᴇᴛ:</b> <code>{settings.get('turnstile_secret_key', 'N/A')}</code>"
         )
         buttons = [
-            [InlineKeyboardButton("ʀ-sɪᴛᴇ", callback_data="edit_auth_recaptcha_site_key", style=ButtonStyle.PRIMARY), InlineKeyboardButton("ʀ-sᴇᴄʀᴇᴛ", callback_data="edit_auth_recaptcha_secret_key", style=ButtonStyle.PRIMARY)],
-            [InlineKeyboardButton("ᴛ-sɪᴛᴇ", callback_data="edit_auth_turnstile_site_key", style=ButtonStyle.PRIMARY), InlineKeyboardButton("ᴛ-sᴇᴄʀᴇᴛ", callback_data="edit_auth_turnstile_secret_key", style=ButtonStyle.PRIMARY)],
-            [InlineKeyboardButton("🔙 ʙᴀᴄᴋ", callback_data="show_auth", style=ButtonStyle.SECONDARY)]
+            [InlineKeyboardButton("ʀ-sɪᴛᴇ", callback_data="edit_auth_recaptcha_site_key", style="primary"), InlineKeyboardButton("ʀ-sᴇᴄʀᴇᴛ", callback_data="edit_auth_recaptcha_secret_key", style="primary")],
+            [InlineKeyboardButton("ᴛ-sɪᴛᴇ", callback_data="edit_auth_turnstile_site_key", style="primary"), InlineKeyboardButton("ᴛ-sᴇᴄʀᴇᴛ", callback_data="edit_auth_turnstile_secret_key", style="primary")],
+            [InlineKeyboardButton("🔙 ʙᴀᴄᴋ", callback_data="show_auth", style="primary")]
         ]
         return await edit_panel_message(query, text, InlineKeyboardMarkup(buttons))
 
@@ -573,14 +573,14 @@ async def panel_callback(client: Client, query: CallbackQuery):
         )
         buttons = [
             [
-                InlineKeyboardButton(f"Normal: {'🟢' if protect_normal else '🔴'}", callback_data="toggle_protect_protect_content_normal", style=ButtonStyle.PRIMARY),
-                InlineKeyboardButton(f"Premium: {'🟢' if protect_premium else '🔴'}", callback_data="toggle_protect_protect_content_premium", style=ButtonStyle.PRIMARY)
+                InlineKeyboardButton(f"Normal: {'🟢' if protect_normal else '🔴'}", callback_data="toggle_protect_protect_content_normal", style="primary"),
+                InlineKeyboardButton(f"Premium: {'🟢' if protect_premium else '🔴'}", callback_data="toggle_protect_protect_content_premium", style="primary")
             ],
             [
-                InlineKeyboardButton(f"Auth/Admins: {'🟢' if protect_auth else '🔴'}", callback_data="toggle_protect_protect_content_auth", style=ButtonStyle.PRIMARY)
+                InlineKeyboardButton(f"Auth/Admins: {'🟢' if protect_auth else '🔴'}", callback_data="toggle_protect_protect_content_auth", style="primary")
             ],
             [
-                InlineKeyboardButton("🔙 ʙᴀᴄᴋ", callback_data="show_auth", style=ButtonStyle.SECONDARY)
+                InlineKeyboardButton("🔙 ʙᴀᴄᴋ", callback_data="show_auth", style="primary")
             ]
         ]
         return await edit_panel_message(query, text, InlineKeyboardMarkup(buttons))
@@ -677,10 +677,10 @@ async def panel_callback(client: Client, query: CallbackQuery):
         buttons = []
         for i, url in enumerate(banners):
             text += f"• `{i+1}`: {url[:30]}...\n"
-            buttons.append([InlineKeyboardButton(f"🗑 Delete #{i+1}", callback_data=f"del_banner_{i}", style=ButtonStyle.DANGER)])
+            buttons.append([InlineKeyboardButton(f"🗑 Delete #{i+1}", callback_data=f"del_banner_{i}", style="danger")])
 
-        buttons.append([InlineKeyboardButton("➕ ᴀᴅᴅ ʙᴀɴɴᴇʀ ᴜʀʟ", callback_data="add_banner", style=ButtonStyle.SUCCESS)])
-        buttons.append([InlineKeyboardButton("🔙 ʙᴀᴄᴋ", callback_data="refresh_panel", style=ButtonStyle.SECONDARY)])
+        buttons.append([InlineKeyboardButton("➕ ᴀᴅᴅ ʙᴀɴɴᴇʀ ᴜʀʟ", callback_data="add_banner", style="success")])
+        buttons.append([InlineKeyboardButton("🔙 ʙᴀᴄᴋ", callback_data="refresh_panel", style="primary")])
         return await edit_panel_message(query, text, InlineKeyboardMarkup(buttons))
 
     elif data == "add_banner":
@@ -737,12 +737,12 @@ async def panel_callback(client: Client, query: CallbackQuery):
         buttons = []
         for i in range(len(shorteners)):
             buttons.append([
-                InlineKeyboardButton(f"⚙️ sʜᴏʀᴛ {i+1}", callback_data=f"conf_short_{i}", style=ButtonStyle.PRIMARY),
-                InlineKeyboardButton(f"🗑 ᴅᴇʟᴇᴛᴇ", callback_data=f"del_short_{i}", style=ButtonStyle.DANGER)
+                InlineKeyboardButton(f"⚙️ sʜᴏʀᴛ {i+1}", callback_data=f"conf_short_{i}", style="primary"),
+                InlineKeyboardButton(f"🗑 ᴅᴇʟᴇᴛᴇ", callback_data=f"del_short_{i}", style="danger")
             ])
 
-        buttons.append([InlineKeyboardButton("➕ ᴀᴅᴅ sʜᴏʀᴛᴇɴᴇʀ", callback_data="add_shortener", style=ButtonStyle.SUCCESS)])
-        buttons.append([InlineKeyboardButton("🔙 ʙᴀᴄᴋ", callback_data="refresh_panel", style=ButtonStyle.SECONDARY)])
+        buttons.append([InlineKeyboardButton("➕ ᴀᴅᴅ sʜᴏʀᴛᴇɴᴇʀ", callback_data="add_shortener", style="success")])
+        buttons.append([InlineKeyboardButton("🔙 ʙᴀᴄᴋ", callback_data="refresh_panel", style="primary")])
         return await edit_panel_message(query, text, InlineKeyboardMarkup(buttons))
 
     elif data.startswith("conf_short_"):
@@ -764,19 +764,19 @@ async def panel_callback(client: Client, query: CallbackQuery):
 
             buttons = [
                 [
-                    InlineKeyboardButton(f"📱 Mini App{get_check('mini_app')}", callback_data=f"set_shmethod_{idx}_mini_app", style=ButtonStyle.PRIMARY),
-                    InlineKeyboardButton(f"📱 Browser{get_check('browser')}", callback_data=f"set_shmethod_{idx}_browser", style=ButtonStyle.PRIMARY)
+                    InlineKeyboardButton(f"📱 Mini App{get_check('mini_app')}", callback_data=f"set_shmethod_{idx}_mini_app", style="primary"),
+                    InlineKeyboardButton(f"📱 Browser{get_check('browser')}", callback_data=f"set_shmethod_{idx}_browser", style="primary")
                 ],
                 [
-                    InlineKeyboardButton(f"🔌 API URL{get_check('api_url')}", callback_data=f"set_shmethod_{idx}_api_url", style=ButtonStyle.PRIMARY),
-                    InlineKeyboardButton(f"🌐 Web URL{get_check('web_url')}", callback_data=f"set_shmethod_{idx}_web_url", style=ButtonStyle.PRIMARY)
+                    InlineKeyboardButton(f"🔌 API URL{get_check('api_url')}", callback_data=f"set_shmethod_{idx}_api_url", style="primary"),
+                    InlineKeyboardButton(f"🌐 Web URL{get_check('web_url')}", callback_data=f"set_shmethod_{idx}_web_url", style="primary")
                 ],
                 [
-                    InlineKeyboardButton(f"🌐 Own Browser{get_check('own_browser')}", callback_data=f"set_shmethod_{idx}_own_browser", style=ButtonStyle.PRIMARY),
-                    InlineKeyboardButton(f"🌐 Global Fallback{get_check('global')}", callback_data=f"set_shmethod_{idx}_global", style=ButtonStyle.SECONDARY)
+                    InlineKeyboardButton(f"🌐 Own Browser{get_check('own_browser')}", callback_data=f"set_shmethod_{idx}_own_browser", style="primary"),
+                    InlineKeyboardButton(f"🌐 Global Fallback{get_check('global')}", callback_data=f"set_shmethod_{idx}_global", style="primary")
                 ],
                 [
-                    InlineKeyboardButton("🔙 ʙᴀᴄᴋ", callback_data="manage_shorteners", style=ButtonStyle.SECONDARY)
+                    InlineKeyboardButton("🔙 ʙᴀᴄᴋ", callback_data="manage_shorteners", style="primary")
                 ]
             ]
             return await edit_panel_message(query, text, InlineKeyboardMarkup(buttons))
@@ -851,10 +851,10 @@ async def panel_callback(client: Client, query: CallbackQuery):
 
         buttons = []
         for i in range(len(videos)):
-            buttons.append([InlineKeyboardButton(f"🗑 ᴅᴇʟᴇᴛᴇ ᴠɪᴅᴇᴏ {i+1}", callback_data=f"del_video_banner_{i}", style=ButtonStyle.DANGER)])
+            buttons.append([InlineKeyboardButton(f"🗑 ᴅᴇʟᴇᴛᴇ ᴠɪᴅᴇᴏ {i+1}", callback_data=f"del_video_banner_{i}", style="danger")])
 
-        buttons.append([InlineKeyboardButton("➕ ᴀᴅᴅ ᴠɪᴅᴇᴏ ᴜʀʟ", callback_data="add_video_banner", style=ButtonStyle.SUCCESS)])
-        buttons.append([InlineKeyboardButton("🔙 ʙᴀᴄᴋ", callback_data="refresh_panel", style=ButtonStyle.SECONDARY)])
+        buttons.append([InlineKeyboardButton("➕ ᴀᴅᴅ ᴠɪᴅᴇᴏ ᴜʀʟ", callback_data="add_video_banner", style="success")])
+        buttons.append([InlineKeyboardButton("🔙 ʙᴀᴄᴋ", callback_data="refresh_panel", style="primary")])
         return await edit_panel_message(query, text, InlineKeyboardMarkup(buttons))
 
     elif data == "add_video_banner":
@@ -909,10 +909,10 @@ async def panel_callback(client: Client, query: CallbackQuery):
                 text += f"{i+1}. @{h['username']}\n"
                 # Use bot ID for deletion security instead of full token
                 bot_id = h['token'].split(":")[0]
-                buttons.append([InlineKeyboardButton(f"🗑 Delete @{h['username']}", callback_data=f"del_helper_{bot_id}", style=ButtonStyle.DANGER)])
+                buttons.append([InlineKeyboardButton(f"🗑 Delete @{h['username']}", callback_data=f"del_helper_{bot_id}", style="danger")])
 
-        buttons.append([InlineKeyboardButton("➕ ᴀᴅᴅ ʜᴇʟᴘᴇʀ ʙᴏᴛ", callback_data="add_helper", style=ButtonStyle.SUCCESS)])
-        buttons.append([InlineKeyboardButton("🔙 ʙᴀᴄᴋ", callback_data="refresh_panel", style=ButtonStyle.SECONDARY)])
+        buttons.append([InlineKeyboardButton("➕ ᴀᴅᴅ ʜᴇʟᴘᴇʀ ʙᴏᴛ", callback_data="add_helper", style="success")])
+        buttons.append([InlineKeyboardButton("🔙 ʙᴀᴄᴋ", callback_data="refresh_panel", style="primary")])
         return await edit_panel_message(query, text, InlineKeyboardMarkup(buttons))
 
     elif data == "add_helper":
@@ -992,15 +992,15 @@ async def panel_callback(client: Client, query: CallbackQuery):
 
         buttons = [
             [
-                InlineKeyboardButton("➕ ᴀᴅᴅ ᴘʀᴏxʏ", callback_data="add_proxy_prompt", style=ButtonStyle.SUCCESS),
-                InlineKeyboardButton("🗑 ᴅᴇʟᴇᴛᴇ ᴘʀᴏxʏ", callback_data="delete_proxy_list", style=ButtonStyle.DANGER)
+                InlineKeyboardButton("➕ ᴀᴅᴅ ᴘʀᴏxʏ", callback_data="add_proxy_prompt", style="success"),
+                InlineKeyboardButton("🗑 ᴅᴇʟᴇᴛᴇ ᴘʀᴏxʏ", callback_data="delete_proxy_list", style="danger")
             ],
             [
-                InlineKeyboardButton("🔄 ᴄʜᴇᴄᴋ ᴘʀᴏxɪᴇs", callback_data="check_proxies_act", style=ButtonStyle.PRIMARY),
-                InlineKeyboardButton(f"⚙️ sᴛʀᴀᴛᴇɢʏ: {proxy_manager.rotation_strategy.replace('_', ' ').upper()}", callback_data="toggle_proxy_strategy", style=ButtonStyle.SECONDARY)
+                InlineKeyboardButton("🔄 ᴄʜᴇᴄᴋ ᴘʀᴏxɪᴇs", callback_data="check_proxies_act", style="primary"),
+                InlineKeyboardButton(f"⚙️ sᴛʀᴀᴛᴇɢʏ: {proxy_manager.rotation_strategy.replace('_', ' ').upper()}", callback_data="toggle_proxy_strategy", style="primary")
             ],
             [
-                InlineKeyboardButton("🔙 ʙᴀᴄᴋ", callback_data="refresh_panel", style=ButtonStyle.SECONDARY)
+                InlineKeyboardButton("🔙 ʙᴀᴄᴋ", callback_data="refresh_panel", style="primary")
             ]
         ]
         return await edit_panel_message(query, text, InlineKeyboardMarkup(buttons))
@@ -1053,9 +1053,9 @@ async def panel_callback(client: Client, query: CallbackQuery):
         buttons = []
         for p in proxies:
             masked = mask_proxy(p['proxy'])
-            buttons.append([InlineKeyboardButton(f"🗑️ {masked}", callback_data=f"del_proxy_act_{p['id']}", style=ButtonStyle.DANGER)])
+            buttons.append([InlineKeyboardButton(f"🗑️ {masked}", callback_data=f"del_proxy_act_{p['id']}", style="danger")])
 
-        buttons.append([InlineKeyboardButton("🔙 ʙᴀᴄᴋ", callback_data="manage_proxies", style=ButtonStyle.SECONDARY)])
+        buttons.append([InlineKeyboardButton("🔙 ʙᴀᴄᴋ", callback_data="manage_proxies", style="primary")])
         return await edit_panel_message(query, text, InlineKeyboardMarkup(buttons))
 
     elif data.startswith("del_proxy_act_"):
@@ -1111,14 +1111,14 @@ async def panel_callback(client: Client, query: CallbackQuery):
         )
         buttons = [
             [
-                InlineKeyboardButton("➕ sᴇᴛ / ᴇᴅɪᴛ", callback_data="set_caption_prompt", style=ButtonStyle.PRIMARY),
-                InlineKeyboardButton("🗑 ʀᴇsᴇᴛ / ᴅᴇʟᴇᴛᴇ", callback_data="reset_custom_caption", style=ButtonStyle.DANGER)
+                InlineKeyboardButton("➕ sᴇᴛ / ᴇᴅɪᴛ", callback_data="set_caption_prompt", style="primary"),
+                InlineKeyboardButton("🗑 ʀᴇsᴇᴛ / ᴅᴇʟᴇᴛᴇ", callback_data="reset_custom_caption", style="danger")
             ],
             [
-                InlineKeyboardButton(f"🚀 Tᴏɢɢʟᴇ: {'🟢' if caption_active else '🔴'}", callback_data="toggle_custom_caption", style=ButtonStyle.SUCCESS)
+                InlineKeyboardButton(f"🚀 Tᴏɢɢʟᴇ: {'🟢' if caption_active else '🔴'}", callback_data="toggle_custom_caption", style="success")
             ],
             [
-                InlineKeyboardButton("🔙 ʙᴀᴄᴋ", callback_data="refresh_panel", style=ButtonStyle.SECONDARY)
+                InlineKeyboardButton("🔙 ʙᴀᴄᴋ", callback_data="refresh_panel", style="primary")
             ]
         ]
         return await edit_panel_message(query, text, InlineKeyboardMarkup(buttons))
@@ -1203,12 +1203,12 @@ async def panel_callback(client: Client, query: CallbackQuery):
             for d in dests:
                 icon = "📢" if d.get('type') == 'channel' else "👥"
                 text += f"• {icon} <b>{d.get('title')}</b>\n  ID: <code>{d.get('chat_id')}</code>\n\n"
-                buttons.append([InlineKeyboardButton(f"🗑 Delete {d.get('title')[:20]}", callback_data=f"del_vlog_{d.get('chat_id')}", style=ButtonStyle.DANGER)])
+                buttons.append([InlineKeyboardButton(f"🗑 Delete {d.get('title')[:20]}", callback_data=f"del_vlog_{d.get('chat_id')}", style="danger")])
 
         if len(dests) < 4:
-            buttons.append([InlineKeyboardButton("➕ Add Channel / Group", callback_data="set_verify_log_channel", style=ButtonStyle.SUCCESS)])
+            buttons.append([InlineKeyboardButton("➕ Add Channel / Group", callback_data="set_verify_log_channel", style="success")])
 
-        buttons.append([InlineKeyboardButton("🔙 Back", callback_data="refresh_panel", style=ButtonStyle.SECONDARY)])
+        buttons.append([InlineKeyboardButton("🔙 Back", callback_data="refresh_panel", style="primary")])
         return await edit_panel_message(query, text, InlineKeyboardMarkup(buttons))
 
     elif data.startswith("del_vlog_"):
@@ -1367,18 +1367,18 @@ async def panel_callback(client: Client, query: CallbackQuery):
 
         buttons = [
             [
-                InlineKeyboardButton(f"🚀 Status: {'🟢 Enabled' if ver_enabled else '🔴 Disabled'}", callback_data="set_ver_toggle", style=ButtonStyle.SUCCESS)
+                InlineKeyboardButton(f"🚀 Status: {'🟢 Enabled' if ver_enabled else '🔴 Disabled'}", callback_data="set_ver_toggle", style="success")
             ],
             [
-                InlineKeyboardButton(f"🔌 API URL{get_check('api_url')}", callback_data="set_ver_method_api_url", style=ButtonStyle.PRIMARY),
-                InlineKeyboardButton(f"🌐 Web URL{get_check('web_url')}", callback_data="set_ver_method_web_url", style=ButtonStyle.PRIMARY)
+                InlineKeyboardButton(f"🔌 API URL{get_check('api_url')}", callback_data="set_ver_method_api_url", style="primary"),
+                InlineKeyboardButton(f"🌐 Web URL{get_check('web_url')}", callback_data="set_ver_method_web_url", style="primary")
             ],
             [
-                InlineKeyboardButton(f"📱 Mini App{get_check('mini_app')}", callback_data="set_ver_method_mini_app", style=ButtonStyle.PRIMARY),
-                InlineKeyboardButton(f"📱 Browser{get_check('browser')}", callback_data="set_ver_method_browser", style=ButtonStyle.PRIMARY)
+                InlineKeyboardButton(f"📱 Mini App{get_check('mini_app')}", callback_data="set_ver_method_mini_app", style="primary"),
+                InlineKeyboardButton(f"📱 Browser{get_check('browser')}", callback_data="set_ver_method_browser", style="primary")
             ],
             [
-                InlineKeyboardButton(f"🌐 Own Browser{get_check('own_browser')}", callback_data="set_ver_method_own_browser", style=ButtonStyle.PRIMARY)
+                InlineKeyboardButton(f"🌐 Own Browser{get_check('own_browser')}", callback_data="set_ver_method_own_browser", style="primary")
             ]
         ]
 
@@ -1386,19 +1386,19 @@ async def panel_callback(client: Client, query: CallbackQuery):
             check_proxy = " ✅" if ob_mode == "proxy" else ""
             check_normal = " ✅" if ob_mode == "normal" else ""
             buttons.append([
-                InlineKeyboardButton(f"🌐 With Proxy & Iframe{check_proxy}", callback_data="set_ver_obmode_proxy", style=ButtonStyle.PRIMARY),
-                InlineKeyboardButton(f"🌐 Normal{check_normal}", callback_data="set_ver_obmode_normal", style=ButtonStyle.PRIMARY)
+                InlineKeyboardButton(f"🌐 With Proxy & Iframe{check_proxy}", callback_data="set_ver_obmode_proxy", style="primary"),
+                InlineKeyboardButton(f"🌐 Normal{check_normal}", callback_data="set_ver_obmode_normal", style="primary")
             ])
         elif ver_method == "browser":
             check_proxy = " ✅" if b_mode == "proxy" else ""
             check_normal = " ✅" if b_mode == "normal" else ""
             buttons.append([
-                InlineKeyboardButton(f"📱 With Proxy & Iframe{check_proxy}", callback_data="set_ver_bmode_proxy", style=ButtonStyle.PRIMARY),
-                InlineKeyboardButton(f"📱 Normal{check_normal}", callback_data="set_ver_bmode_normal", style=ButtonStyle.PRIMARY)
+                InlineKeyboardButton(f"📱 With Proxy & Iframe{check_proxy}", callback_data="set_ver_bmode_proxy", style="primary"),
+                InlineKeyboardButton(f"📱 Normal{check_normal}", callback_data="set_ver_bmode_normal", style="primary")
             ])
 
         buttons.append([
-            InlineKeyboardButton("🔙 ʙᴀᴄᴋ", callback_data="refresh_panel", style=ButtonStyle.SECONDARY)
+            InlineKeyboardButton("🔙 ʙᴀᴄᴋ", callback_data="refresh_panel", style="primary")
         ])
         return await edit_panel_message(query, text, InlineKeyboardMarkup(buttons))
 

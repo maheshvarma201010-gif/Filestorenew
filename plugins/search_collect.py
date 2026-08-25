@@ -18,7 +18,7 @@ from pyrogram.types import Message, InlineKeyboardMarkup, CallbackQuery, WebAppI
 from pyrogram.errors import MessageNotModified, FloodWait
 from config import OWNER_ID, BOT_USERNAME, WEBSITE_URL, TUT_VID
 import urllib.parse
-from helper_func import encode, get_message_id, admin, get_messages, get_filename, ButtonStyle, get_exp_time, InlineKeyboardButton
+from helper_func import encode, get_message_id, admin, get_messages, get_filename, get_exp_time, InlineKeyboardButton
 from database.database import db
 from utils.formatter import RichText
 from database.db_premium import is_premium_user
@@ -526,18 +526,18 @@ async def search_command(client: Client, message: Message):
                     print(f"Error shortening URL in search: {e}")
 
             buttons = [
-                [InlineKeyboardButton("✅ Verify Now", web_app=WebAppInfo(url=final_redirect), style=ButtonStyle.PRIMARY)]
+                [InlineKeyboardButton("✅ Verify Now", web_app=WebAppInfo(url=final_redirect), style="primary")]
             ]
             tut_link = settings.get("tutorial_link", TUT_VID)
             tut_enabled = settings.get("tutorial_enabled", True)
             if tut_enabled and tut_link:
-                buttons.append([InlineKeyboardButton("📹 Tutorial", url=tut_link, style=ButtonStyle.SECONDARY)])
+                buttons.append([InlineKeyboardButton("📹 Tutorial", url=tut_link, style="primary")])
 
             buttons.append([
                 InlineKeyboardButton(
                     "✅ I Have Verified",
                     url=f"https://t.me/{bot_username}?start=verify_{session_id}",
-                    style=ButtonStyle.SUCCESS
+                    style="success"
                 )
             ])
 
