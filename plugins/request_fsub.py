@@ -17,7 +17,7 @@ import time
 from pyrogram import Client, filters, __version__
 from pyrogram.enums import ParseMode, ChatAction, ChatMemberStatus, ChatType
 from pyrogram.types import Message, InlineKeyboardMarkup, CallbackQuery, ReplyKeyboardMarkup, ChatMemberUpdated, ChatPermissions
-from helper_func import InlineKeyboardButton, random_button_style, ButtonStyle
+from helper_func import InlineKeyboardButton, random_button_style
 from pyrogram.errors.exceptions.bad_request_400 import UserNotParticipant, InviteHashEmpty, ChatAdminRequired, PeerIdInvalid, UserIsBlocked, InputUserDeactivated, UserNotParticipant
 from config import *
 from helper_func import *
@@ -51,11 +51,11 @@ async def change_force_sub_mode(client: Client, message: Message):
             mode = await db.get_channel_mode(ch_id)
             status = "🟢" if mode == "on" else "🔴"
             title = f"{status} {chat.title}"
-            buttons.append([InlineKeyboardButton(title, callback_data=f"rfs_ch_{ch_id}", style=ButtonStyle.PRIMARY)])
+            buttons.append([InlineKeyboardButton(title, callback_data=f"rfs_ch_{ch_id}", style="primary")])
         except:
-            buttons.append([InlineKeyboardButton(f"⚠️ {ch_id} (ᴜɴᴀᴠᴀɪʟᴀʙʟᴇ)", callback_data=f"rfs_ch_{ch_id}", style=ButtonStyle.SECONDARY)])
+            buttons.append([InlineKeyboardButton(f"⚠️ {ch_id} (ᴜɴᴀᴠᴀɪʟᴀʙʟᴇ)", callback_data=f"rfs_ch_{ch_id}", style="primary")])
 
-    buttons.append([InlineKeyboardButton("🔒 ᴄʟᴏsᴇ", callback_data="close", style=ButtonStyle.DANGER)])
+    buttons.append([InlineKeyboardButton("🔒 ᴄʟᴏsᴇ", callback_data="close", style="danger")])
 
     await temp.edit(
         "⚡ <b>˹ ᴛᴏɢɢʟᴇ ꜰᴏʀᴄᴇ-sᴜʙ ᴍᴏᴅᴇ ˼</b>",
@@ -217,7 +217,7 @@ async def list_force_sub_channels(client: Client, message: Message):
         except Exception:
             result += f"<b>•</b> <code>{ch_id}</code> — <i>Unavailable</i>\n"
 
-    await temp.edit(result, disable_web_page_preview=True, reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Close ✖️", callback_data="close", style=ButtonStyle.DANGER)]]))
+    await temp.edit(result, disable_web_page_preview=True, reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Close ✖️", callback_data="close", style="danger")]]))
 
 # Don't Remove Credit @AniZoneFlix, @AniZoneFlix
 # Ask Doubt on telegram @AniZoneFlix
