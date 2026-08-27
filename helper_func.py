@@ -87,6 +87,14 @@ class ColorInlineKeyboardButton(PyrogramInlineKeyboardButton):
 
         self.style = style_enum
 
+        # Add visual color indicator emoji to text if not already present
+        if style_enum == ButtonStyle.SUCCESS and not any(icon in text for icon in ["🟢", "✅", "🚀", "📢", "🤖", "🔄"]):
+            text = f"🟢 {text}"
+        elif style_enum == ButtonStyle.DANGER and not any(icon in text for icon in ["🔴", "❌", "🗑", "🔒", "🚫"]):
+            text = f"🔴 {text}"
+        elif style_enum == ButtonStyle.PRIMARY and not any(icon in text for icon in ["🔵", "⚙️", "⚙", "📱", "🌐", "🔌", "➕", "🔙"]):
+            text = f"🔵 {text}"
+
         if style_enum is not None:
             try:
                 super().__init__(text, *args, style=style_enum, **kwargs)

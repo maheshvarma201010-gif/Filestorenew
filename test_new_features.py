@@ -336,6 +336,19 @@ class TestCrossBotLinkGeneration(unittest.TestCase):
         link_main = asyncio.run(generate_list_link(client, -100123456789, [10, 11, 12]))
         self.assertIn("https://t.me/main_bot?start=", link_main)
 
+class TestColorInlineKeyboardButton(unittest.TestCase):
+    def test_color_button_text_formatting(self):
+        from helper_func import ColorInlineKeyboardButton, ButtonStyle
+
+        b_success = ColorInlineKeyboardButton("Start Process", callback_data="test", style=ButtonStyle.SUCCESS)
+        self.assertIn("🟢", b_success.text)
+
+        b_danger = ColorInlineKeyboardButton("Delete Item", callback_data="test", style=ButtonStyle.DANGER)
+        self.assertIn("🔴", b_danger.text)
+
+        b_primary = ColorInlineKeyboardButton("Info Page", callback_data="test", style=ButtonStyle.PRIMARY)
+        self.assertIn("🔵", b_primary.text)
+
 class TestShortlinkFallback(unittest.TestCase):
     def test_trace_and_store_session_url_fallback(self):
         import asyncio
