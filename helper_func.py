@@ -56,6 +56,7 @@ def random_button_style():
 class ColorInlineKeyboardButton(PyrogramInlineKeyboardButton):
     def __init__(self, text: str, *args, **kwargs):
         style = kwargs.pop("style", None)
+        api_kwargs = kwargs.pop("api_kwargs", None)
 
         # Map new style names if explicitly passed
         if style in ["bg_success", "bg_danger", "bg_primary"]:
@@ -103,11 +104,6 @@ class ColorInlineKeyboardButton(PyrogramInlineKeyboardButton):
                 pass
             except Exception:
                 pass
-
-        if style_enum is not None:
-            api_kwargs = kwargs.setdefault("api_kwargs", {})
-            if isinstance(api_kwargs, dict) and "style" not in api_kwargs:
-                api_kwargs["style"] = style_enum
 
         super().__init__(text, *args, **kwargs)
 
