@@ -58,7 +58,9 @@ class ColorInlineKeyboardButton(PyrogramInlineKeyboardButton):
         style = kwargs.pop("style", None)
         api_kwargs = kwargs.pop("api_kwargs", None)
 
-        # Map new style names if explicitly passed
+        if api_kwargs and isinstance(api_kwargs, dict) and "style" in api_kwargs:
+            style = style or api_kwargs.get("style")
+
         if style in ["bg_success", "bg_danger", "bg_primary"]:
             if style == "bg_success":
                 style_enum = ButtonStyle.SUCCESS
@@ -68,33 +70,18 @@ class ColorInlineKeyboardButton(PyrogramInlineKeyboardButton):
                 style_enum = ButtonStyle.PRIMARY
         elif isinstance(style, ButtonStyle):
             style_enum = style
-        else:
-            # Try to resolve other formats
-            style_str = str(style).upper() if style else ""
-            if hasattr(ButtonStyle, style_str):
-                style_enum = getattr(ButtonStyle, style_str)
+        elif isinstance(style, str) and style:
+            style_str = style.lower()
+            if style_str in ["primary", "success", "danger", "default"]:
+                style_enum = style_str
+            elif hasattr(ButtonStyle, style.upper()):
+                style_enum = getattr(ButtonStyle, style.upper())
             else:
-                # Automatic Color Assignment based on button text
-                text_lower = str(text).lower()
-                success_keywords = ["download", "get", "generate", "start", "continue", "confirm", "watch", "active", "verify", "yes"]
-                danger_keywords = ["delete", "remove", "cancel", "stop", "ban", "no", "close", "clear", "reset"]
-
-                if any(kw in text_lower for kw in success_keywords):
-                    style_enum = ButtonStyle.SUCCESS
-                elif any(kw in text_lower for kw in danger_keywords):
-                    style_enum = ButtonStyle.DANGER
-                else:
-                    style_enum = ButtonStyle.PRIMARY
+                style_enum = ButtonStyle.PRIMARY
+        else:
+            style_enum = None
 
         self.style = style_enum
-
-        # Add visual color indicator emoji to text if not already present
-        if style_enum == ButtonStyle.SUCCESS and not any(icon in text for icon in ["🟢", "✅", "🚀", "📢", "🤖", "🔄"]):
-            text = f"🟢 {text}"
-        elif style_enum == ButtonStyle.DANGER and not any(icon in text for icon in ["🔴", "❌", "🗑", "🔒", "🚫"]):
-            text = f"🔴 {text}"
-        elif style_enum == ButtonStyle.PRIMARY and not any(icon in text for icon in ["🔵", "⚙️", "⚙", "📱", "🌐", "🔌", "➕", "🔙"]):
-            text = f"🔵 {text}"
 
         if style_enum is not None:
             try:
