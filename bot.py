@@ -13,7 +13,10 @@
 
 import uvicorn
 import asyncio
-import pyromod.listen
+try:
+    import pyromod
+except ImportError:
+    import pyromod.listen
 from pyrogram import Client
 from pyrogram.types import BotCommand
 from pyrogram.enums import ParseMode

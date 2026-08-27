@@ -1593,12 +1593,16 @@ async def start_command(client: Client, message: Message):
         buttons = [
             [InlineKeyboardButton(f"📢 {bot_name}: JOIN OUR COMMUNITY", url=community_url, style=ButtonStyle.PRIMARY)],
             [
-                InlineKeyboardButton("⚙️ ˹ ᴀʙᴏᴜᴛ ˼", callback_data="about", style=ButtonStyle.SECONDARY),
-                InlineKeyboardButton("✨ ˹ ʜᴇʟᴘ ˼", callback_data="help", style=ButtonStyle.SECONDARY)
+                InlineKeyboardButton("🟢 ˹ sᴜᴘᴘᴏʀᴛ ˼", url=community_url, style=ButtonStyle.SUCCESS),
+                InlineKeyboardButton("👥 ˹ ɢʀᴏᴜᴘ ˼", url=community_url, style=ButtonStyle.SUCCESS)
+            ],
+            [
+                InlineKeyboardButton("⚙️ ˹ ᴀʙᴏᴜᴛ ˼", callback_data="about", style=ButtonStyle.PRIMARY),
+                InlineKeyboardButton("🆘 ˹ ʜᴇʟᴘ ˼", callback_data="help", style=ButtonStyle.DANGER)
             ],
             [
                 InlineKeyboardButton("💎 ˹ ᴘʀᴇᴍɪᴜᴍ ˼", callback_data="premium", style=ButtonStyle.SUCCESS),
-                InlineKeyboardButton("🤝 ˹ ʀᴇꜰᴇʀ ˼", callback_data="referral_info", style=ButtonStyle.SECONDARY)
+                InlineKeyboardButton("🤝 ˹ ʀᴇꜰᴇʀ ˼", callback_data="referral_info", style=ButtonStyle.PRIMARY)
             ]
         ]
 
