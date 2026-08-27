@@ -337,17 +337,25 @@ class TestCrossBotLinkGeneration(unittest.TestCase):
         self.assertIn("https://t.me/main_bot?start=", link_main)
 
 class TestColorInlineKeyboardButton(unittest.TestCase):
-    def test_color_button_text_formatting(self):
+    def test_color_button_styles_and_emoji(self):
         from helper_func import ColorInlineKeyboardButton, ButtonStyle
 
-        b_success = ColorInlineKeyboardButton("Start Process", callback_data="test", style=ButtonStyle.SUCCESS)
-        self.assertIn("🟢", b_success.text)
+        b_success = ColorInlineKeyboardButton("Confirm", callback_data="test", style="success", icon_custom_emoji_id="54321")
+        self.assertEqual(b_success.style, "success")
+        self.assertEqual(b_success.icon_custom_emoji_id, "54321")
 
-        b_danger = ColorInlineKeyboardButton("Delete Item", callback_data="test", style=ButtonStyle.DANGER)
-        self.assertIn("🔴", b_danger.text)
+        b_danger = ColorInlineKeyboardButton("Delete", callback_data="test", style="danger")
+        self.assertEqual(b_danger.style, "danger")
 
-        b_primary = ColorInlineKeyboardButton("Info Page", callback_data="test", style=ButtonStyle.PRIMARY)
-        self.assertIn("🔵", b_primary.text)
+        b_primary = ColorInlineKeyboardButton("Settings", callback_data="test", style="primary")
+        self.assertEqual(b_primary.style, "primary")
+
+        b_default = ColorInlineKeyboardButton("Neutral", callback_data="test", style="default")
+        self.assertEqual(b_default.style, "default")
+
+        b_bg = ColorInlineKeyboardButton("BG Success", callback_data="test", style="bg_success", api_kwargs={"icon_custom_emoji_id": "12345"})
+        self.assertEqual(b_bg.style, ButtonStyle.SUCCESS)
+        self.assertEqual(b_bg.icon_custom_emoji_id, "12345")
 
 class TestShortlinkFallback(unittest.TestCase):
     def test_trace_and_store_session_url_fallback(self):

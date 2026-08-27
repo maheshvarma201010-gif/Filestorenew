@@ -56,10 +56,14 @@ def random_button_style():
 class ColorInlineKeyboardButton(PyrogramInlineKeyboardButton):
     def __init__(self, text: str, *args, **kwargs):
         style = kwargs.pop("style", None)
+        icon_custom_emoji_id = kwargs.pop("icon_custom_emoji_id", None)
         api_kwargs = kwargs.pop("api_kwargs", None)
 
-        if api_kwargs and isinstance(api_kwargs, dict) and "style" in api_kwargs:
-            style = style or api_kwargs.get("style")
+        if api_kwargs and isinstance(api_kwargs, dict):
+            if "style" in api_kwargs:
+                style = style or api_kwargs.get("style")
+            if "icon_custom_emoji_id" in api_kwargs:
+                icon_custom_emoji_id = icon_custom_emoji_id or api_kwargs.get("icon_custom_emoji_id")
 
         if style in ["bg_success", "bg_danger", "bg_primary"]:
             if style == "bg_success":
@@ -82,12 +86,20 @@ class ColorInlineKeyboardButton(PyrogramInlineKeyboardButton):
             style_enum = None
 
         self.style = style_enum
+        self.icon_custom_emoji_id = icon_custom_emoji_id
 
+        extra_kwargs = {}
         if style_enum is not None:
+            extra_kwargs["style"] = style_enum
+        if icon_custom_emoji_id is not None:
+            extra_kwargs["icon_custom_emoji_id"] = icon_custom_emoji_id
+
+        if extra_kwargs:
             try:
-                super().__init__(text, *args, style=style_enum, **kwargs)
+                super().__init__(text, *args, **{**kwargs, **extra_kwargs})
                 return
             except TypeError:
+                # Fallback if underlying class initializer does not accept style/icon_custom_emoji_id directly
                 pass
             except Exception:
                 pass
