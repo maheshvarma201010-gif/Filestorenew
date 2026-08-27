@@ -336,5 +336,45 @@ class TestCrossBotLinkGeneration(unittest.TestCase):
         link_main = asyncio.run(generate_list_link(client, -100123456789, [10, 11, 12]))
         self.assertIn("https://t.me/main_bot?start=", link_main)
 
+class TestColorInlineKeyboardButton(unittest.TestCase):
+    def test_color_button_text_formatting(self):
+        from helper_func import ColorInlineKeyboardButton, ButtonStyle
+
+        b_success = ColorInlineKeyboardButton("Start Process", callback_data="test", style=ButtonStyle.SUCCESS)
+        self.assertIn("🟢", b_success.text)
+
+        b_danger = ColorInlineKeyboardButton("Delete Item", callback_data="test", style=ButtonStyle.DANGER)
+        self.assertIn("🔴", b_danger.text)
+
+        b_primary = ColorInlineKeyboardButton("Info Page", callback_data="test", style=ButtonStyle.PRIMARY)
+        self.assertIn("🔵", b_primary.text)
+
+class TestShortlinkFallback(unittest.TestCase):
+    def test_trace_and_store_session_url_fallback(self):
+        import asyncio
+        from unittest.mock import patch, AsyncMock
+        from web_server import trace_and_store_session_url
+
+        token_data = {
+            'session_id': 'test_sess_123',
+            'shortener_url': 'https://antibypass-ijri.onrender.com',
+            'shortener_api': 'sk_R1PT8X44NUQOGKS3DNnBgg'
+        }
+        settings = {'website_url': 'https://cdn26.pixeldrain.eu.cc'}
+
+        class DummyRequest:
+            url = type('URL', (), {'scheme': 'https', 'netloc': 'cdn26.pixeldrain.eu.cc'})()
+
+        async def run_test():
+            with patch('web_server.db.sessions.find_one', new=AsyncMock(return_value=None)), \
+                 patch('web_server.get_short_link', new=AsyncMock(return_value=None)), \
+                 patch('web_server.db.sessions.update_one', new=AsyncMock()) as mock_update:
+
+                res = await trace_and_store_session_url('token_123', token_data, settings, DummyRequest())
+                self.assertEqual(res, 'https://cdn26.pixeldrain.eu.cc/track/test_sess_123')
+                self.assertNotIn('/st?api=', res)
+
+        asyncio.run(run_test())
+
 if __name__ == "__main__":
     unittest.main()

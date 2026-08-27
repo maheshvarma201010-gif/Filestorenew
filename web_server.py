@@ -393,11 +393,6 @@ async def trace_and_store_session_url(token, token_data, settings, request):
         short_link = None
         if shortener_url and api_key:
             short_link = await get_short_link(target, shortener_url=shortener_url, api_key=api_key)
-            if not short_link:
-                if any(domain in shortener_url for domain in ["babylinks.in", "arolinks.com", "vplinks.in"]):
-                    short_link = f"{shortener_url}/st?api={api_key}&url={urllib.parse.quote(target)}"
-                else:
-                    short_link = f"{shortener_url}/st?api={api_key}&url={urllib.parse.quote(target)}"
 
         if short_link:
             traced_last_url = await trace_shortlink(short_link)
