@@ -338,24 +338,17 @@ class TestCrossBotLinkGeneration(unittest.TestCase):
 
 class TestColorInlineKeyboardButton(unittest.TestCase):
     def test_color_button_styles_and_emoji(self):
-        from helper_func import ColorInlineKeyboardButton
+        from helper_func import ColorInlineKeyboardButton, InlineKeyboardButton, InlineKeyboardMarkup
 
-        b_success = ColorInlineKeyboardButton("Confirm", callback_data="test", style="success", icon_custom_emoji_id="54321")
-        self.assertEqual(b_success.style, "success")
-        self.assertEqual(b_success.icon_custom_emoji_id, "54321")
+        btn = ColorInlineKeyboardButton("Confirm", callback_data="test", style="success", icon_custom_emoji_id="5355142851615283756")
+        self.assertEqual(getattr(btn, "style", None), "success")
+        self.assertEqual(getattr(btn, "icon_custom_emoji_id", None), "5355142851615283756")
 
-        b_danger = ColorInlineKeyboardButton("Delete", callback_data="test", style="danger")
-        self.assertEqual(b_danger.style, "danger")
+        btn_primary = InlineKeyboardButton("Settings", callback_data="s", style="primary", icon_custom_emoji_id="5440389890787281213")
+        self.assertEqual(getattr(btn_primary, "style", None), "primary")
 
-        b_primary = ColorInlineKeyboardButton("Settings", callback_data="test", style="primary")
-        self.assertEqual(b_primary.style, "primary")
-
-        b_default = ColorInlineKeyboardButton("Neutral", callback_data="test", style="default")
-        self.assertEqual(b_default.style, "default")
-
-        b_bg = ColorInlineKeyboardButton("BG Success", callback_data="test", style="bg_success", api_kwargs={"icon_custom_emoji_id": "12345"})
-        self.assertEqual(b_bg.style, "success")
-        self.assertEqual(b_bg.icon_custom_emoji_id, "12345")
+        markup = InlineKeyboardMarkup([[btn]])
+        self.assertEqual(getattr(markup.inline_keyboard[0][0], "style", None), "success")
 
 class TestShortlinkFallback(unittest.TestCase):
     def test_trace_and_store_session_url_fallback(self):

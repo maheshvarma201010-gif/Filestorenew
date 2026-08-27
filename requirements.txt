@@ -1,5 +1,6 @@
 # --- Telegram Bot Frameworks --- #
 wzgram>=3.0.36
+pyTelegramBotAPI>=4.26.0
 python-telegram-bot>=22.7
 TgCrypto>=1.2.5
 pyromod>=2.0.0
