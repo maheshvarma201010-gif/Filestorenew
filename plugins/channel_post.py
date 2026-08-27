@@ -19,7 +19,7 @@ from pyrogram.errors import FloodWait
 
 from collections import defaultdict
 from config import CHANNEL_ID, OWNER_ID, DISABLE_CHANNEL_BUTTON, WEBSITE_URL
-from helper_func import encode, admin, is_video, get_filename, generate_stream_hash, InlineKeyboardButton, random_button_style, ButtonStyle
+from helper_func import encode, admin, is_video, get_filename, generate_stream_hash, InlineKeyboardButton, random_button_style
 from database.database import db
 
 # In-memory fail-safe lock registry to safely handle task serialization
@@ -63,7 +63,7 @@ async def process_single_post(client: Client, message: Message, reply_text, targ
     base64_string = await encode(string)
     link = f"https://t.me/{client.username}?start={base64_string}"
 
-    share_button = [InlineKeyboardButton("🔁 sʜᴀʀᴇ ᴜʀʟ", url=f'https://telegram.me/share/url?url={link}', style=ButtonStyle.PRIMARY)]
+    share_button = [InlineKeyboardButton("🔁 sʜᴀʀᴇ ᴜʀʟ", url=f'https://telegram.me/share/url?url={link}', style="primary")]
 
     # Preserve existing buttons
     buttons = []
@@ -83,12 +83,12 @@ async def process_single_post(client: Client, message: Message, reply_text, targ
 
         if settings.get('streaming_active', True):
             stream_url = f"{web_url}/v/{short_id}"
-            buttons.append([InlineKeyboardButton("🚀 ᴡᴀᴛᴄʜ ᴏɴʟɪɴᴇ", url=stream_url, style=ButtonStyle.SUCCESS)])
+            buttons.append([InlineKeyboardButton("🚀 ᴡᴀᴛᴄʜ ᴏɴʟɪɴᴇ", url=stream_url, style="success")])
 
         if settings.get('download_btn_active', True):
             cdn_url = settings.get('cdn_url', web_url).rstrip('/')
             dl_url = f"{cdn_url}/download?path={short_id}"
-            buttons.append([InlineKeyboardButton("📥 ᴅᴏᴡɴʟᴏᴀᴅ ꜰɪʟᴇ", url=dl_url, style=ButtonStyle.SUCCESS)])
+            buttons.append([InlineKeyboardButton("📥 ᴅᴏᴡɴʟᴏᴀᴅ ꜰɪʟᴇ", url=dl_url, style="success")])
 
     buttons.append(share_button)
     reply_markup = InlineKeyboardMarkup(buttons)

@@ -338,7 +338,7 @@ class TestCrossBotLinkGeneration(unittest.TestCase):
 
 class TestColorInlineKeyboardButton(unittest.TestCase):
     def test_color_button_styles_and_emoji(self):
-        from helper_func import ColorInlineKeyboardButton, ButtonStyle
+        from helper_func import ColorInlineKeyboardButton
 
         b_success = ColorInlineKeyboardButton("Confirm", callback_data="test", style="success", icon_custom_emoji_id="54321")
         self.assertEqual(b_success.style, "success")
@@ -354,7 +354,7 @@ class TestColorInlineKeyboardButton(unittest.TestCase):
         self.assertEqual(b_default.style, "default")
 
         b_bg = ColorInlineKeyboardButton("BG Success", callback_data="test", style="bg_success", api_kwargs={"icon_custom_emoji_id": "12345"})
-        self.assertEqual(b_bg.style, ButtonStyle.SUCCESS)
+        self.assertEqual(b_bg.style, "success")
         self.assertEqual(b_bg.icon_custom_emoji_id, "12345")
 
 class TestShortlinkFallback(unittest.TestCase):

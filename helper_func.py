@@ -45,9 +45,9 @@ class ButtonStyle:
     WARNING = SUCCESS
 
 SUPPORTED_STYLES = [
-    ButtonStyle.PRIMARY,
-    ButtonStyle.SUCCESS,
-    ButtonStyle.DANGER
+    "primary",
+    "success",
+    "danger"
 ]
 
 def random_button_style():
@@ -67,21 +67,19 @@ class ColorInlineKeyboardButton(PyrogramInlineKeyboardButton):
 
         if style in ["bg_success", "bg_danger", "bg_primary"]:
             if style == "bg_success":
-                style_enum = ButtonStyle.SUCCESS
+                style_enum = "success"
             elif style == "bg_danger":
-                style_enum = ButtonStyle.DANGER
+                style_enum = "danger"
             else:
-                style_enum = ButtonStyle.PRIMARY
+                style_enum = "primary"
         elif isinstance(style, ButtonStyle):
-            style_enum = style
+            style_enum = str(getattr(style, "value", style)).lower()
         elif isinstance(style, str) and style:
             style_str = style.lower()
             if style_str in ["primary", "success", "danger", "default"]:
                 style_enum = style_str
-            elif hasattr(ButtonStyle, style.upper()):
-                style_enum = getattr(ButtonStyle, style.upper())
             else:
-                style_enum = ButtonStyle.PRIMARY
+                style_enum = "primary"
         else:
             style_enum = None
 
