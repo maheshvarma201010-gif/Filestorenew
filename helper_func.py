@@ -11,9 +11,6 @@ import urllib.parse
 import hashlib
 import random
 
-import telebot
-from telebot.types import InlineKeyboardButton as TelebotInlineKeyboardButton, InlineKeyboardMarkup as TelebotInlineKeyboardMarkup
-
 try:
     from pyrogram import filters
     from pyrogram.enums import ChatMemberStatus
