@@ -255,8 +255,8 @@ async def autobatch_and_advbatch(client: Client, message: Message):
 
     markup = InlineKeyboardMarkup([
         [
-            InlineKeyboardButton("🚀 Start All", callback_data=f"ab_start_{wizard_confirm_id}_{'adv' if is_adv else 'reg'}"),
-            InlineKeyboardButton("❌ Cancel", callback_data="ab_cancel_wizard")
+            InlineKeyboardButton("🚀 Start All", callback_data=f"ab_start_{wizard_confirm_id}_{'adv' if is_adv else 'reg'}", style="success"),
+            InlineKeyboardButton("❌ Cancel", callback_data="ab_cancel_wizard", style="danger")
         ]
     ])
     await message.reply_text(confirm_text, reply_markup=markup)
