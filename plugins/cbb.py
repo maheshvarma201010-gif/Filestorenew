@@ -12,7 +12,7 @@ from config import *
 from pyrogram.types import Message, InlineKeyboardMarkup, CallbackQuery
 from database.database import *
 from helper_func import *
-from helper_func import InlineKeyboardButton, random_button_style, ButtonStyle, get_banners, send_media
+from helper_func import InlineKeyboardButton, random_button_style, get_banners, send_media
 from utils.formatter import RichText
 
 @Client.on_callback_query(filters.regex(r"^(help|about|start|premium|close|fsub_back|ck|rfs_|car_idx:|car_dl_all:)"))
@@ -47,8 +47,8 @@ async def cb_handler(client: Client, query: CallbackQuery):
             "━━━━━━━━━━━━━━━━━━━"
         )
         buttons = [
-            [InlineKeyboardButton('🔙 ʙᴀᴄᴋ ᴛᴏ ʜᴏᴍᴇ', callback_data='start', style=ButtonStyle.SECONDARY)],
-            [InlineKeyboardButton('🛡️ ᴄʟᴏsᴇ ᴍᴇɴᴜ', callback_data='close', style=ButtonStyle.DANGER)]
+            [InlineKeyboardButton('🔙 ʙᴀᴄᴋ ᴛᴏ ʜᴏᴍᴇ', callback_data='start', style="primary")],
+            [InlineKeyboardButton('🛡️ ᴄʟᴏsᴇ ᴍᴇɴᴜ', callback_data='close', style="danger")]
         ]
         try:
             await query.message.edit_caption(caption=text, reply_markup=InlineKeyboardMarkup(buttons))
@@ -60,8 +60,8 @@ async def cb_handler(client: Client, query: CallbackQuery):
             await query.message.edit_caption(
                 caption=ABOUT_TXT,
                 reply_markup=InlineKeyboardMarkup([
-                    [InlineKeyboardButton('ʜᴏᴍᴇ', callback_data='start', style=ButtonStyle.SECONDARY),
-                     InlineKeyboardButton('ᴄʟᴏꜱᴇ', callback_data='close', style=ButtonStyle.DANGER)]
+                    [InlineKeyboardButton('ʜᴏᴍᴇ', callback_data='start', style="primary"),
+                     InlineKeyboardButton('ᴄʟᴏꜱᴇ', callback_data='close', style="danger")]
                 ])
             )
         except Exception:
@@ -69,21 +69,21 @@ async def cb_handler(client: Client, query: CallbackQuery):
                 text=ABOUT_TXT,
                 disable_web_page_preview=True,
                 reply_markup=InlineKeyboardMarkup([
-                    [InlineKeyboardButton('ʜᴏᴍᴇ', callback_data='start', style=ButtonStyle.SECONDARY),
-                     InlineKeyboardButton('ᴄʟᴏsᴇ', callback_data='close', style=ButtonStyle.DANGER)]
+                    [InlineKeyboardButton('ʜᴏᴍᴇ', callback_data='start', style="primary"),
+                     InlineKeyboardButton('ᴄʟᴏsᴇ', callback_data='close', style="danger")]
                 ])
             )
 
     elif data == "start":
         # Premium Start Buttons
         buttons = [
-            [InlineKeyboardButton("📢 NAME: JOIN OUR COMMUNITY", url="https://t.me/AniZoneFlix", style=ButtonStyle.PRIMARY)],
+            [InlineKeyboardButton("📢 NAME: JOIN OUR COMMUNITY", url="https://t.me/AniZoneFlix", style="primary")],
             [
-                InlineKeyboardButton("⚙️ ˹ ᴀʙᴏᴜᴛ ˼", callback_data="about", style=ButtonStyle.SECONDARY),
-                InlineKeyboardButton("✨ ˹ ʜᴇʟᴘ ˼", callback_data="help", style=ButtonStyle.SECONDARY)
+                InlineKeyboardButton("⚙️ ˹ ᴀʙᴏᴜᴛ ˼", callback_data="about", style="primary"),
+                InlineKeyboardButton("✨ ˹ ʜᴇʟᴘ ˼", callback_data="help", style="primary")
             ],
             [
-                InlineKeyboardButton("💎 ˹ ᴘʀᴇᴍɪᴜᴍ ˼", callback_data="premium", style=ButtonStyle.SUCCESS)
+                InlineKeyboardButton("💎 ˹ ᴘʀᴇᴍɪᴜᴍ ˼", callback_data="premium", style="success")
             ]
         ]
         try:
@@ -144,8 +144,8 @@ async def cb_handler(client: Client, query: CallbackQuery):
             caption=caption,
             reply_markup=InlineKeyboardMarkup(
                 [
-                    [InlineKeyboardButton("💬 Cᴏɴᴛᴀᴄᴛ Aᴅᴍɪɴ", url=SCREENSHOT_URL, style=ButtonStyle.PRIMARY)],
-                    [InlineKeyboardButton("🔒 Cʟᴏsᴇ", callback_data="close", style=ButtonStyle.DANGER)]
+                    [InlineKeyboardButton("💬 Cᴏɴᴛᴀᴄᴛ Aᴅᴍɪɴ", url=SCREENSHOT_URL, style="primary")],
+                    [InlineKeyboardButton("🔒 Cʟᴏsᴇ", callback_data="close", style="danger")]
                 ]
             )
         )
@@ -167,8 +167,8 @@ async def cb_handler(client: Client, query: CallbackQuery):
             status = "🟢 ᴏɴ" if mode == "on" else "🔴 ᴏғғ"
             new_mode = "ᴏғғ" if mode == "on" else "on"
             buttons = [
-                [InlineKeyboardButton(f"ʀᴇǫ ᴍᴏᴅᴇ {'OFF' if mode == 'on' else 'ON'}", callback_data=f"rfs_toggle_{cid}_{new_mode}", style=ButtonStyle.PRIMARY)],
-                [InlineKeyboardButton("‹ ʙᴀᴄᴋ", callback_data="fsub_back", style=ButtonStyle.SECONDARY)]
+                [InlineKeyboardButton(f"ʀᴇǫ ᴍᴏᴅᴇ {'OFF' if mode == 'on' else 'ON'}", callback_data=f"rfs_toggle_{cid}_{new_mode}", style="primary")],
+                [InlineKeyboardButton("‹ ʙᴀᴄᴋ", callback_data="fsub_back", style="primary")]
             ]
             await query.message.edit_text(
                 f"Channel: {chat.title}\nCurrent Force-Sub Mode: {status}",
@@ -190,8 +190,8 @@ async def cb_handler(client: Client, query: CallbackQuery):
         status = "🟢 ON" if mode == "on" else "🔴 OFF"
         new_mode = "off" if mode == "on" else "on"
         buttons = [
-            [InlineKeyboardButton(f"ʀᴇǫ ᴍᴏᴅᴇ {'OFF' if mode == 'on' else 'ON'}", callback_data=f"rfs_toggle_{cid}_{new_mode}", style=ButtonStyle.PRIMARY)],
-            [InlineKeyboardButton("‹ ʙᴀᴄᴋ", callback_data="fsub_back", style=ButtonStyle.SECONDARY)]
+            [InlineKeyboardButton(f"ʀᴇǫ ᴍᴏᴅᴇ {'OFF' if mode == 'on' else 'ON'}", callback_data=f"rfs_toggle_{cid}_{new_mode}", style="primary")],
+            [InlineKeyboardButton("‹ ʙᴀᴄᴋ", callback_data="fsub_back", style="primary")]
         ]
         await query.message.edit_text(
             f"Channel: {chat.title}\nCurrent Force-Sub Mode: {status}",
@@ -206,7 +206,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
                 chat = await client.get_chat(cid)
                 mode = await db.get_channel_mode(cid)
                 status = "🟢" if mode == "on" else "🔴"
-                buttons.append([InlineKeyboardButton(f"{status} {chat.title}", callback_data=f"rfs_ch_{cid}", style=ButtonStyle.PRIMARY)])
+                buttons.append([InlineKeyboardButton(f"{status} {chat.title}", callback_data=f"rfs_ch_{cid}", style="primary")])
             except:
                 continue
 

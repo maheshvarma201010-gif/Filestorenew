@@ -14,40 +14,16 @@ import random
 try:
     from pyrogram import filters
     from pyrogram.enums import ChatMemberStatus
-    from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton as PyrogramInlineKeyboardButton
+    from pyrogram.types import Message, InlineKeyboardMarkup as PyrogramInlineKeyboardMarkup, InlineKeyboardButton as PyrogramInlineKeyboardButton
 except ImportError:
     from pyrofork import filters
     from pyrofork.enums import ChatMemberStatus
-    from pyrofork.types import Message, InlineKeyboardMarkup, InlineKeyboardButton as PyrogramInlineKeyboardButton
-
-HAS_BUTTON_STYLE = False
-PyrogramButtonStyle = None
-
-try:
-    try:
-        from pyrogram.enums.button_style import ButtonStyle as PyrogramButtonStyle
-    except ImportError:
-        try:
-            from pyrogram.enums import ButtonStyle as PyrogramButtonStyle
-        except ImportError:
-            from pyrofork.enums import ButtonStyle as PyrogramButtonStyle
-    if PyrogramButtonStyle is not None:
-        HAS_BUTTON_STYLE = True
-except ImportError:
-    pass
-
-class ButtonStyle:
-    PRIMARY = getattr(PyrogramButtonStyle, "PRIMARY", "primary") if PyrogramButtonStyle else "primary"
-    SUCCESS = getattr(PyrogramButtonStyle, "SUCCESS", "success") if PyrogramButtonStyle else "success"
-    DANGER = getattr(PyrogramButtonStyle, "DANGER", "danger") if PyrogramButtonStyle else "danger"
-    DEFAULT = getattr(PyrogramButtonStyle, "DEFAULT", "default") if PyrogramButtonStyle else "default"
-    SECONDARY = PRIMARY
-    WARNING = SUCCESS
+    from pyrofork.types import Message, InlineKeyboardMarkup as PyrogramInlineKeyboardMarkup, InlineKeyboardButton as PyrogramInlineKeyboardButton
 
 SUPPORTED_STYLES = [
-    ButtonStyle.PRIMARY,
-    ButtonStyle.SUCCESS,
-    ButtonStyle.DANGER
+    "primary",
+    "success",
+    "danger"
 ]
 
 def random_button_style():
@@ -56,36 +32,45 @@ def random_button_style():
 class ColorInlineKeyboardButton(PyrogramInlineKeyboardButton):
     def __init__(self, text: str, *args, **kwargs):
         style = kwargs.pop("style", None)
+        icon_custom_emoji_id = kwargs.pop("icon_custom_emoji_id", None)
         api_kwargs = kwargs.pop("api_kwargs", None)
 
-        if api_kwargs and isinstance(api_kwargs, dict) and "style" in api_kwargs:
-            style = style or api_kwargs.get("style")
+        if api_kwargs and isinstance(api_kwargs, dict):
+            if "style" in api_kwargs:
+                style = style or api_kwargs.get("style")
+            if "icon_custom_emoji_id" in api_kwargs:
+                icon_custom_emoji_id = icon_custom_emoji_id or api_kwargs.get("icon_custom_emoji_id")
 
         if style in ["bg_success", "bg_danger", "bg_primary"]:
             if style == "bg_success":
-                style_enum = ButtonStyle.SUCCESS
+                style_str = "success"
             elif style == "bg_danger":
-                style_enum = ButtonStyle.DANGER
+                style_str = "danger"
             else:
-                style_enum = ButtonStyle.PRIMARY
-        elif isinstance(style, ButtonStyle):
-            style_enum = style
+                style_str = "primary"
         elif isinstance(style, str) and style:
-            style_str = style.lower()
-            if style_str in ["primary", "success", "danger", "default"]:
-                style_enum = style_str
-            elif hasattr(ButtonStyle, style.upper()):
-                style_enum = getattr(ButtonStyle, style.upper())
+            style_lower = style.lower()
+            if style_lower in ["primary", "success", "danger", "default"]:
+                style_str = style_lower
             else:
-                style_enum = ButtonStyle.PRIMARY
+                style_str = "primary"
+        elif style is not None:
+            style_str = str(getattr(style, "value", style)).lower()
         else:
-            style_enum = None
+            style_str = None
 
-        self.style = style_enum
+        self.style = style_str
+        self.icon_custom_emoji_id = icon_custom_emoji_id
 
-        if style_enum is not None:
+        extra_kwargs = {}
+        if style_str is not None:
+            extra_kwargs["style"] = style_str
+        if icon_custom_emoji_id is not None:
+            extra_kwargs["icon_custom_emoji_id"] = icon_custom_emoji_id
+
+        if extra_kwargs:
             try:
-                super().__init__(text, *args, style=style_enum, **kwargs)
+                super().__init__(text, *args, **{**kwargs, **extra_kwargs})
                 return
             except TypeError:
                 pass
@@ -96,9 +81,11 @@ class ColorInlineKeyboardButton(PyrogramInlineKeyboardButton):
 
 ColoredInlineKeyboardButton = ColorInlineKeyboardButton
 InlineKeyboardButton = ColorInlineKeyboardButton
+InlineKeyboardMarkup = PyrogramInlineKeyboardMarkup
 
 import pyrogram.types
 pyrogram.types.InlineKeyboardButton = ColorInlineKeyboardButton
+pyrogram.types.InlineKeyboardMarkup = PyrogramInlineKeyboardMarkup
 from config import *
 from pyrogram.errors.exceptions.bad_request_400 import UserNotParticipant
 from pyrogram.errors import FloodWait
