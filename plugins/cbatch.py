@@ -22,11 +22,11 @@ async def cbatch(client: Client, message: Message):
         input_text = message.text
         has_arg = len(message.command) > 1 if message.text else False
 
-        # Support Reply mode
+        # Always prompt for range input unless replying to a message with range
         if message.reply_to_message:
             reply_text = message.reply_to_message.text or message.reply_to_message.caption or ""
             input_text = f"/cbatch\n{reply_text}"
-        elif not has_arg:
+        else:
             try:
                 ask = await client.ask(
                     message.chat.id,

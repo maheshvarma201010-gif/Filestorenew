@@ -119,6 +119,20 @@ async def get_users(client: Client, message: Message):
 
 @Client.on_message(filters.command('restart') & filters.private & admin)
 async def restart_bot(client: Client, message: Message):
+    try:
+        ask = await client.ask(
+            message.chat.id,
+            "<b>🔄 Are you sure you want to restart the bot?</b>\n\nReply <code>yes</code> to confirm or <code>/cancel</code> to abort.",
+            filters=filters.text,
+            timeout=60
+        )
+        if ask.text.lower().strip() not in ["yes", "y", "confirm"]:
+            await ask.reply("❌ <b>Restart Cancelled.</b>")
+            return
+    except asyncio.TimeoutError:
+        await message.reply("⏰ <b>Restart Prompt Timed Out.</b>")
+        return
+
     msg = await message.reply("<b>🔄 ˹ ʀᴇsᴛᴀʀᴛɪɴɢ sʏsᴛᴇᴍ... ˼</b>")
 
     # Log the restart event
