@@ -20,6 +20,16 @@ except ImportError:
     from pyrofork.enums import ChatMemberStatus
     from pyrofork.types import Message, InlineKeyboardMarkup as PyrogramInlineKeyboardMarkup, InlineKeyboardButton as PyrogramInlineKeyboardButton
 
+try:
+    from telebot import TeleBot
+    from telebot.types import Message as TelebotMessage, InlineKeyboardMarkup as TelebotInlineKeyboardMarkup, InlineKeyboardButton as TelebotInlineKeyboardButton, CallbackQuery as TelebotCallbackQuery
+except ImportError:
+    TeleBot = None
+    TelebotMessage = None
+    TelebotInlineKeyboardMarkup = None
+    TelebotInlineKeyboardButton = None
+    TelebotCallbackQuery = None
+
 SUPPORTED_STYLES = [
     "primary",
     "success",
@@ -1050,7 +1060,7 @@ Client.on_message = patched_on_message
 
 # Upgrade all InlineKeyboardButton classes to ColoredInlineKeyboardButton in all Pyrogram libraries
 import sys
-for pkg in ["pyrogram", "pyrofork", "wzgram"]:
+for pkg in ["pyrogram", "pyrofork", "wzgram", "telebot"]:
     try:
         types_mod = sys.modules.get(f"{pkg}.types")
         if not types_mod:
