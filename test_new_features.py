@@ -350,6 +350,20 @@ class TestColorInlineKeyboardButton(unittest.TestCase):
         markup = InlineKeyboardMarkup([[btn]])
         self.assertEqual(getattr(markup.inline_keyboard[0][0], "style", None), "success")
 
+    def test_telebot_color_inline_keyboard_button(self):
+        from helper_func import TeleBot, TelebotMessage, TelebotInlineKeyboardMarkup, TelebotInlineKeyboardButton, TelebotCallbackQuery
+        import telebot.types
+
+        self.assertIsNotNone(TeleBot)
+        self.assertIsNotNone(TelebotMessage)
+        self.assertIsNotNone(TelebotInlineKeyboardMarkup)
+        self.assertIsNotNone(TelebotInlineKeyboardButton)
+        self.assertIsNotNone(TelebotCallbackQuery)
+
+        tb_btn = telebot.types.InlineKeyboardButton("Click Me", callback_data="tb_cb", style="danger", icon_custom_emoji_id="12345678")
+        self.assertEqual(getattr(tb_btn, "style", None), "danger")
+        self.assertEqual(getattr(tb_btn, "icon_custom_emoji_id", None), "12345678")
+
 class TestShortlinkFallback(unittest.TestCase):
     def test_trace_and_store_session_url_fallback(self):
         import asyncio
